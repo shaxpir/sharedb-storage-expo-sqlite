@@ -118,6 +118,270 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
   });
 
   describe('Schema strategies', function() {
+    it('should handle potential namespace collisions with system tables', function(done) {
+      const adapter = new NodeSqliteAdapter({debug: false});
+      
+      // Test with collection names that could collide with system tables
+      const schemaStrategy = new CollectionPerTableStrategy({
+        collectionConfig: {
+          'meta': {  // User collection named 'meta' - potential collision!
+            indexes: ['userId', 'key'],
+            encryptedFields: []
+          },
+          'inventory': {  // User collection named 'inventory' - potential collision!
+            indexes: ['warehouse', 'sku'],
+            encryptedFields: []
+          },
+          'normal_collection': {
+            indexes: ['id'],
+            encryptedFields: []
+          }
+        },
+        debug: false
+      });
+
+      const storage = new SqliteStorage({
+        adapter: adapter,
+        schemaStrategy: schemaStrategy,
+        dbFileName: testDbFile,
+        dbFileDir: testDbDir,
+        debug: false
+      });
+
+      storage.initialize(function(inventory) {
+        console.log('Test: initialized, inventory:', inventory);
+        expect(inventory).to.exist;
+        
+        // Test that we can write to collections named 'meta' and 'inventory'
+        // without conflicting with system tables
+        const testDocs = [
+          {
+            id: 'user_meta_1',
+            collection: 'meta',  // This should become 'col_meta' table
+            payload: {
+              userId: 'user1',
+              key: 'preferences',
+              value: JSON.stringify({theme: 'dark'})
+            }
+          },
+          {
+            id: 'warehouse_inv_1',
+            collection: 'inventory',  // This should become 'col_inventory' table
+            payload: {
+              warehouse: 'west',
+              sku: 'ABC123',
+              quantity: 100
+            }
+          },
+          {
+            id: 'doc1',
+            collection: 'normal_collection',
+            payload: {
+              data: 'test'
+            }
+          }
+        ];
+
+        storage.writeRecords({docs: testDocs}, function(err) {
+          console.log('Test: writeRecords callback, err:', err);
+          expect(err).to.not.exist;
+          
+          // Verify we can read back from user collections
+          // Note: For ShareDB storage interface, storeName should be 'docs' for all documents
+          // The collection is determined from the document itself
+          console.log('Test: About to read user_meta_1');
+          storage.readRecord('docs', 'user_meta_1', function(payload) {
+            console.log('Test: Got payload for user_meta_1:', payload);
+            expect(payload).to.exist;
+            expect(payload.userId).to.equal('user1');
+            
+            storage.readRecord('docs', 'warehouse_inv_1', function(payload2) {
+              expect(payload2).to.exist;
+              expect(payload2.sku).to.equal('ABC123');
+              
+              // Also verify the system inventory still works
+              storage.updateInventory('normal_collection', 'doc1', 1, 'add', function(err2) {
+                expect(err2).to.not.exist;
+                
+                storage.readInventory(function(err3, systemInventory) {
+                  expect(err3).to.not.exist;
+                  expect(systemInventory).to.exist;
+                  // System inventory should track our normal_collection document
+                  expect(systemInventory.payload.collections).to.have.property('normal_collection');
+                  
+                  storage.close(done);
+                });
+              });
+            });
+          });
+        });
+      });
+    });
+
+    it('should work with CollectionPerTableStrategy with realistic collections', function(done) {
+      const adapter = new NodeSqliteAdapter({debug: false});
+      
+      // Realistic collection configuration for a writing platform
+      const schemaStrategy = new CollectionPerTableStrategy({
+        collectionConfig: {
+          'manuscripts': {
+            indexes: ['authorId', 'createdAt', 'status', 'genre'],
+            encryptedFields: []
+          },
+          'chapters': {
+            indexes: ['manuscriptId', 'chapterNumber', 'authorId'],
+            encryptedFields: []
+          },
+          'characters': {
+            indexes: ['manuscriptId', 'name', 'role'],
+            encryptedFields: []
+          },
+          'scenes': {
+            indexes: ['chapterId', 'sceneNumber', 'location'],
+            encryptedFields: []
+          },
+          'comments': {
+            indexes: ['manuscriptId', 'chapterId', 'userId', 'timestamp'],
+            encryptedFields: []
+          },
+          'revisions': {
+            indexes: ['documentId', 'documentType', 'version', 'timestamp'],
+            encryptedFields: []
+          },
+          'collaborators': {
+            indexes: ['manuscriptId', 'userId', 'role', 'addedAt'],
+            encryptedFields: ['email', 'permissions']
+          },
+          'writing_sessions': {
+            indexes: ['userId', 'startTime', 'endTime', 'wordCount'],
+            encryptedFields: []
+          }
+        },
+        useEncryption: true,
+        encryptionCallback: function(text) {
+          return Buffer.from(text).toString('base64');
+        },
+        decryptionCallback: function(encrypted) {
+          return Buffer.from(encrypted, 'base64').toString();
+        },
+        debug: false
+      });
+
+      const storage = new SqliteStorage({
+        adapter: adapter,
+        schemaStrategy: schemaStrategy,
+        dbFileName: testDbFile,
+        dbFileDir: testDbDir,
+        debug: false
+      });
+
+      storage.initialize(function(inventory) {
+        expect(inventory).to.exist;
+        
+        // Test data for multiple collections
+        const testDocs = [
+          {
+            id: 'manuscript1',
+            collection: 'manuscripts',
+            payload: {
+              title: 'The Great Novel',
+              authorId: 'author1',
+              status: 'draft',
+              genre: 'fiction',
+              createdAt: Date.now()
+            }
+          },
+          {
+            id: 'chapter1',
+            collection: 'chapters',
+            payload: {
+              manuscriptId: 'manuscript1',
+              chapterNumber: 1,
+              title: 'The Beginning',
+              authorId: 'author1'
+            }
+          },
+          {
+            id: 'char1',
+            collection: 'characters',
+            payload: {
+              manuscriptId: 'manuscript1',
+              name: 'Jane Doe',
+              role: 'protagonist',
+              description: 'The main character'
+            }
+          },
+          {
+            id: 'scene1',
+            collection: 'scenes',
+            payload: {
+              chapterId: 'chapter1',
+              sceneNumber: 1,
+              location: 'coffee shop',
+              timeOfDay: 'morning'
+            }
+          },
+          {
+            id: 'comment1',
+            collection: 'comments',
+            payload: {
+              manuscriptId: 'manuscript1',
+              chapterId: 'chapter1',
+              userId: 'reviewer1',
+              text: 'Great opening!',
+              timestamp: Date.now()
+            }
+          },
+          {
+            id: 'collab1',
+            collection: 'collaborators',
+            payload: {
+              manuscriptId: 'manuscript1',
+              userId: 'editor1',
+              role: 'editor',
+              email: 'editor@example.com',
+              permissions: 'read,comment',
+              addedAt: Date.now()
+            }
+          }
+        ];
+
+        // Write documents to different collections
+        storage.writeRecords({docs: testDocs}, function(err) {
+          expect(err).to.not.exist;
+          
+          // Verify each collection has its own table
+          // For ShareDB storage interface, use 'docs' as storeName for all documents
+          const verifyPromises = testDocs.map(function(doc) {
+            return new Promise(function(resolve, reject) {
+              storage.readRecord('docs', doc.id, function(payload) {
+                if (!payload) {
+                  reject(new Error('Failed to read ' + doc.id + ' from collection ' + doc.collection));
+                } else {
+                  resolve();
+                }
+              });
+            });
+          });
+          
+          Promise.all(verifyPromises)
+            .then(function() {
+              // Verify that encrypted fields were encrypted (for collaborators)
+              storage.readRecord('docs', 'collab1', function(payload) {
+                expect(payload).to.exist;
+                // The encryptedFields should be decrypted when read
+                expect(payload.email).to.equal('editor@example.com');
+                
+                storage.close(done);
+              });
+            })
+            .catch(function(error) {
+              done(error);
+            });
+        });
+      });
+    });
+
     it('should work with DefaultSchemaStrategy', function(done) {
       const adapter = new NodeSqliteAdapter({debug: false});
       const schemaStrategy = new DefaultSchemaStrategy({
