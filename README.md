@@ -31,11 +31,11 @@ npm install @shaxpir/sharedb-storage-expo-sqlite
 ### Basic Usage
 
 ```javascript
-import ShareDB from '@shaxpir/sharedb';
+import { Connection } from '@shaxpir/sharedb/lib/client';
 import { ExpoSqliteStorage } from '@shaxpir/sharedb-storage-expo-sqlite';
 
 // Create ShareDB connection
-const connection = new ShareDB.Connection(websocket);
+const connection = new Connection(websocket);
 
 // Create storage for DurableStore
 const storage = new ExpoSqliteStorage({
@@ -223,14 +223,14 @@ If you're currently using React Native storage from the core ShareDB package:
 
 ### Before
 ```javascript
-import ShareDB from '@shaxpir/sharedb';
-import { ExpoSqliteStorage } from '@shaxpir/sharedb';  // ❌ Bundling issues
+import { Connection } from '@shaxpir/sharedb/lib/client';
+import { ExpoSqliteStorage } from '@shaxpir/sharedb';  // ❌ No longer available
 ```
 
-### After
+### After  
 ```javascript
-import ShareDB from '@shaxpir/sharedb';
-import { ExpoSqliteStorage } from '@shaxpir/sharedb-storage-expo-sqlite';  // ✅ Clean separation
+import { Connection } from '@shaxpir/sharedb/lib/client';
+import { ExpoSqliteStorage } from '@shaxpir/sharedb-storage-expo-sqlite';  // ✅ Dedicated package
 ```
 
 **That's it!** All your existing configuration and usage patterns remain exactly the same.

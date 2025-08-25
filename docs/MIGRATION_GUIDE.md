@@ -27,13 +27,13 @@ npm install @shaxpir/sharedb-storage-expo-sqlite
 
 **Before:**
 ```typescript
-import ShareDB from '@shaxpir/sharedb';
-import { ExpoSqliteStorage } from '@shaxpir/sharedb';  // ❌ This will cause bundling issues
+import { Connection } from '@shaxpir/sharedb/lib/client';
+import { ExpoSqliteStorage } from '@shaxpir/sharedb';  // ❌ No longer available
 ```
 
 **After:**
 ```typescript
-import ShareDB from '@shaxpir/sharedb';                           // Core ShareDB functionality
+import { Connection } from '@shaxpir/sharedb/lib/client';          // ShareDB client
 import { ExpoSqliteStorage } from '@shaxpir/sharedb-storage-expo-sqlite'; // React Native storage
 ```
 
