@@ -1,6 +1,6 @@
 # Migration Guide: From Core ShareDB to @shaxpir/sharedb-storage-expo-sqlite
 
-This guide helps you migrate from using React Native SQLite storage in the core ShareDB package to the dedicated `@shaxpir/sharedb-storage-expo-sqlite` package.
+This guide helps you migrate from using React Native SQLite storage in the Shaxpir ShareDB fork to the dedicated `@shaxpir/sharedb-storage-expo-sqlite` package for DurableStore integration.
 
 ## Why Migrate?
 
@@ -11,7 +11,7 @@ The React Native storage functionality has been extracted from [@shaxpir/sharedb
 - ✅ **Independent Evolution**: React Native features can evolve separately
 - ✅ **Better Developer Experience**: Clear separation between environments
 
-The core ShareDB package remains your main dependency for all ShareDB functionality - this package simply provides the React Native storage layer.
+The Shaxpir ShareDB fork remains your main dependency for all ShareDB and DurableStore functionality - this package simply provides the React Native storage layer for the DurableStore system.
 
 ## Migration Steps
 

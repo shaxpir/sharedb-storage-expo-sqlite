@@ -1,14 +1,18 @@
 # ShareDB Expo SQLite Storage
 
-A dedicated React Native storage adapter for [ShareDB](https://github.com/share/sharedb) using Expo SQLite, with support for dual-database architectures and connection pooling.
+A dedicated React Native storage adapter for [ShareDB's DurableStore](https://github.com/shaxpir/sharedb) using Expo SQLite, with support for dual-database architectures and connection pooling.
+
+This package provides offline-first storage for the **DurableStore** system - a Shaxpir fork enhancement that enables client-side document persistence and offline operation queuing, not available in the original upstream ShareDB.
 
 ## Features
 
-- ✅ **Expo SQLite Integration** - Native React Native SQLite storage
+- ✅ **DurableStore Integration** - Purpose-built for ShareDB's offline-first DurableStore system
+- ✅ **Expo SQLite Integration** - Native React Native SQLite storage for client-side persistence
 - ✅ **Dual-Database Support** - Pre-initialized database connections with schema prefixes
 - ✅ **Connection Pooling** - Optional connection pooling for improved performance
 - ✅ **Cross-Database Queries** - JOIN operations between multiple databases
 - ✅ **Collection Mapping** - Flexible collection-to-table mapping
+- ✅ **Offline Operation Queuing** - Stores pending operations while offline for later sync
 - ✅ **Zero Migration** - Works with existing table schemas
 - ✅ **Production Ready** - Comprehensive error handling and monitoring
 
@@ -19,7 +23,7 @@ npm install @shaxpir/sharedb-storage-expo-sqlite
 ```
 
 **Peer Dependencies** (automatically installed in Expo/React Native projects):
-- `@shaxpir/sharedb >= 5.4.0`
+- `@shaxpir/sharedb >= 5.4.0` (Shaxpir fork with DurableStore support)
 - `expo-sqlite >= 14.0.0`
 
 ## Quick Start
@@ -33,12 +37,12 @@ import { ExpoSqliteStorage } from '@shaxpir/sharedb-storage-expo-sqlite';
 // Create ShareDB connection
 const connection = new ShareDB.Connection(websocket);
 
-// Create storage
+// Create storage for DurableStore
 const storage = new ExpoSqliteStorage({
   namespace: 'myapp'  // Creates 'sharedb_myapp.db'
 });
 
-// Use with DurableStore for offline support
+// Enable offline-first DurableStore with SQLite persistence
 connection.useDurableStore({ storage });
 ```
 
@@ -269,9 +273,9 @@ MIT © [Shaxpir Inc](https://shaxpir.com)
 ---
 
 **Related Projects:**
-- [ShareDB Core](https://github.com/shaxpir/sharedb) - Core ShareDB functionality (required peer dependency)
-- [ShareDB Official](https://github.com/share/sharedb) - Original ShareDB project
-- [ShareDB Client](https://github.com/share/sharedb/tree/master/lib/client) - Client-side ShareDB
+- [Shaxpir ShareDB Fork](https://github.com/shaxpir/sharedb) - Enhanced ShareDB with DurableStore support (required peer dependency)
+- [Original ShareDB](https://github.com/share/sharedb) - Upstream ShareDB project (without DurableStore)
+- [DurableStore Documentation](https://github.com/shaxpir/sharedb/blob/pluggable-store/DURABLE_STORE_GUIDE.md) - Offline-first client persistence guide
 
 **Package Relationship:**
-This package is a companion to `@shaxpir/sharedb` and provides React Native specific storage functionality that was extracted to avoid bundling conflicts in browser/Node.js environments.
+This package provides React Native storage for the **DurableStore** system in `@shaxpir/sharedb`. The DurableStore enables offline-first document persistence and operation queuing - a key enhancement not available in the original upstream ShareDB. This storage was extracted to avoid bundling conflicts in browser/Node.js environments while providing optimized React Native support.
