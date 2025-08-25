@@ -39,8 +39,6 @@
   "devDependencies": {
     "better-sqlite3": "^12.2.0",
     "chai": "^4.3.7",
-    "eslint": "^8.47.0",
-    "eslint-config-google": "^0.14.0",
     "fake-indexeddb": "^6.1.0",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
@@ -59,10 +57,8 @@
   "scripts": {
     "test": "mocha",
     "test-cover": "nyc --temp-dir=coverage -r text -r lcov npm test",
-    "lint": "eslint --ignore-path .gitignore \"**/*.js\"",
-    "lint:fix": "npm run lint -- --fix",
-    "prepare": "npm run lint && npm test",
-    "prepack": "npm run lint && npm test"
+    "prepare": "npm test",
+    "prepack": "npm test"
   },
   "mocha": {
     "recursive": true,

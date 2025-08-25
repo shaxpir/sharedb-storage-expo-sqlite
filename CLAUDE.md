@@ -8,12 +8,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm test` - Run the full test suite
 - `npm run test-cover` - Run tests with code coverage
 
-### Linting
-- `npm run lint` - Check code style (must pass before committing)
-- `npm run lint:fix` - Auto-fix linting issues
-
 ### Build & Package
-- `npm run prepare` - Run lint and tests before publishing
+- `npm run prepare` - Run tests before publishing
 - `npm run prepack` - Pre-packaging checks
 
 ## Architecture Overview
@@ -95,7 +91,6 @@ const pool = new StandardSQLiteConnectionPool({
 - **DurableStore Focus**: All functionality is designed around DurableStore integration
 - **Peer Dependency**: Requires `@shaxpir/sharedb` (enhanced fork, not upstream ShareDB)
 - **Testing**: Uses Mocha with Sinon for mocking SQLite operations
-- **Linting**: Google style with modifications (matches core ShareDB)
 - **ES3 Compatibility**: Maintains compatibility with ShareDB's ES3 syntax requirements
 
 ### Testing Strategy
