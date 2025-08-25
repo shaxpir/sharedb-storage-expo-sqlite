@@ -269,5 +269,9 @@ MIT © [Shaxpir Inc](https://shaxpir.com)
 ---
 
 **Related Projects:**
-- [ShareDB](https://github.com/share/sharedb) - Realtime database backend
+- [ShareDB Core](https://github.com/shaxpir/sharedb) - Core ShareDB functionality (required peer dependency)
+- [ShareDB Official](https://github.com/share/sharedb) - Original ShareDB project
 - [ShareDB Client](https://github.com/share/sharedb/tree/master/lib/client) - Client-side ShareDB
+
+**Package Relationship:**
+This package is a companion to `@shaxpir/sharedb` and provides React Native specific storage functionality that was extracted to avoid bundling conflicts in browser/Node.js environments.

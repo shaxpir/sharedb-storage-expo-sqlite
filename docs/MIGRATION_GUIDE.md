@@ -4,12 +4,14 @@ This guide helps you migrate from using React Native SQLite storage in the core 
 
 ## Why Migrate?
 
-The React Native storage functionality has been extracted into a dedicated package to:
+The React Native storage functionality has been extracted from [@shaxpir/sharedb](https://github.com/shaxpir/sharedb) into this dedicated package to:
 
 - ✅ **Eliminate Bundling Issues**: No React Native dependencies in browser/Node.js apps
 - ✅ **Cleaner Architecture**: Focused, single-responsibility packages
 - ✅ **Independent Evolution**: React Native features can evolve separately
 - ✅ **Better Developer Experience**: Clear separation between environments
+
+The core ShareDB package remains your main dependency for all ShareDB functionality - this package simply provides the React Native storage layer.
 
 ## Migration Steps
 
