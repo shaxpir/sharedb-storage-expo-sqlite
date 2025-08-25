@@ -1,0 +1,79 @@
+{
+  "name": "@shaxpir/sharedb-storage-expo-sqlite",
+  "version": "1.0.0",
+  "description": "Expo SQLite storage adapter for ShareDB with dual-database and connection pooling support",
+  "main": "lib/expo-sqlite-storage.js",
+  "types": "index.d.ts",
+  "keywords": [
+    "sharedb",
+    "expo",
+    "sqlite",
+    "react-native",
+    "offline",
+    "storage",
+    "database",
+    "realtime",
+    "collaborative",
+    "operational-transform"
+  ],
+  "author": "Benji Smith <benji@shaxpir.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/shaxpir/sharedb-storage-expo-sqlite.git"
+  },
+  "bugs": {
+    "url": "https://github.com/shaxpir/sharedb-storage-expo-sqlite/issues"
+  },
+  "homepage": "https://github.com/shaxpir/sharedb-storage-expo-sqlite#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "peerDependencies": {
+    "@shaxpir/sharedb": ">=5.4.0",
+    "expo-sqlite": ">=14.0.0"
+  },
+  "dependencies": {
+    "generic-pool": "^3.9.0"
+  },
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "eslint": "^8.47.0",
+    "eslint-config-google": "^0.14.0",
+    "fake-indexeddb": "^6.1.0",
+    "mocha": "^10.2.0",
+    "nyc": "^15.1.0",
+    "sinon": "^15.2.0",
+    "sinon-chai": "^3.7.0"
+  },
+  "files": [
+    "lib/",
+    "test/",
+    "docs/",
+    "index.d.ts",
+    "README.md",
+    "PROJECT_PLAN.md"
+  ],
+  "scripts": {
+    "test": "mocha",
+    "test-cover": "nyc --temp-dir=coverage -r text -r lcov npm test",
+    "lint": "eslint --ignore-path .gitignore \"**/*.js\"",
+    "lint:fix": "npm run lint -- --fix",
+    "prepare": "npm run lint && npm test",
+    "prepack": "npm run lint && npm test"
+  },
+  "mocha": {
+    "recursive": true,
+    "timeout": 5000,
+    "spec": "test/**/*-test.js"
+  },
+  "nyc": {
+    "exclude": [
+      "test/**"
+    ],
+    "reporter": [
+      "text",
+      "lcov"
+    ]
+  }
+}
