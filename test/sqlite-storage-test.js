@@ -160,27 +160,30 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
         // without conflicting with system tables
         const testDocs = [
           {
-            id: 'user_meta_1',
-            collection: 'meta',  // This should become 'col_meta' table
+            id: 'meta/user_meta_1',  // Compound key as used by ShareDB DurableStore
             payload: {
+              collection: 'meta',  // Collection inside payload as per ShareDB
+              id: 'user_meta_1',   // Document ID inside payload as per ShareDB
               userId: 'user1',
               key: 'preferences',
               value: JSON.stringify({theme: 'dark'})
             }
           },
           {
-            id: 'warehouse_inv_1',
-            collection: 'inventory',  // This should become 'col_inventory' table
+            id: 'inventory/warehouse_inv_1',  // Compound key as used by ShareDB DurableStore
             payload: {
+              collection: 'inventory',  // Collection inside payload as per ShareDB
+              id: 'warehouse_inv_1',    // Document ID inside payload as per ShareDB
               warehouse: 'west',
               sku: 'ABC123',
               quantity: 100
             }
           },
           {
-            id: 'doc1',
-            collection: 'normal_collection',
+            id: 'normal_collection/doc1',  // Compound key as used by ShareDB DurableStore
             payload: {
+              collection: 'normal_collection',  // Collection inside payload as per ShareDB
+              id: 'doc1',                       // Document ID inside payload as per ShareDB
               data: 'test'
             }
           }
@@ -193,13 +196,13 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
           // Verify we can read back from user collections
           // Note: For ShareDB storage interface, storeName should be 'docs' for all documents
           // The collection is determined from the document itself
-          console.log('Test: About to read user_meta_1');
-          storage.readRecord('docs', 'user_meta_1', function(payload) {
-            console.log('Test: Got payload for user_meta_1:', payload);
+          console.log('Test: About to read meta/user_meta_1');
+          storage.readRecord('docs', 'meta/user_meta_1', function(payload) {
+            console.log('Test: Got payload for meta/user_meta_1:', payload);
             expect(payload).to.exist;
             expect(payload.userId).to.equal('user1');
             
-            storage.readRecord('docs', 'warehouse_inv_1', function(payload2) {
+            storage.readRecord('docs', 'inventory/warehouse_inv_1', function(payload2) {
               expect(payload2).to.exist;
               expect(payload2.sku).to.equal('ABC123');
               
@@ -286,9 +289,10 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
         // Test data for multiple collections
         const testDocs = [
           {
-            id: 'manuscript1',
-            collection: 'manuscripts',
+            id: 'manuscripts/manuscript1',  // Compound key as used by ShareDB DurableStore
             payload: {
+              collection: 'manuscripts',    // Collection inside payload as per ShareDB
+              id: 'manuscript1',           // Document ID inside payload as per ShareDB
               title: 'The Great Novel',
               authorId: 'author1',
               status: 'draft',
@@ -297,9 +301,10 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
             }
           },
           {
-            id: 'chapter1',
-            collection: 'chapters',
+            id: 'chapters/chapter1',        // Compound key as used by ShareDB DurableStore
             payload: {
+              collection: 'chapters',       // Collection inside payload as per ShareDB
+              id: 'chapter1',              // Document ID inside payload as per ShareDB
               manuscriptId: 'manuscript1',
               chapterNumber: 1,
               title: 'The Beginning',
@@ -307,9 +312,10 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
             }
           },
           {
-            id: 'char1',
-            collection: 'characters',
+            id: 'characters/char1',         // Compound key as used by ShareDB DurableStore
             payload: {
+              collection: 'characters',     // Collection inside payload as per ShareDB
+              id: 'char1',                 // Document ID inside payload as per ShareDB
               manuscriptId: 'manuscript1',
               name: 'Jane Doe',
               role: 'protagonist',
@@ -317,9 +323,10 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
             }
           },
           {
-            id: 'scene1',
-            collection: 'scenes',
+            id: 'scenes/scene1',           // Compound key as used by ShareDB DurableStore
             payload: {
+              collection: 'scenes',        // Collection inside payload as per ShareDB
+              id: 'scene1',               // Document ID inside payload as per ShareDB
               chapterId: 'chapter1',
               sceneNumber: 1,
               location: 'coffee shop',
@@ -327,9 +334,10 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
             }
           },
           {
-            id: 'comment1',
-            collection: 'comments',
+            id: 'comments/comment1',     // Compound key as used by ShareDB DurableStore
             payload: {
+              collection: 'comments',    // Collection inside payload as per ShareDB
+              id: 'comment1',           // Document ID inside payload as per ShareDB
               manuscriptId: 'manuscript1',
               chapterId: 'chapter1',
               userId: 'reviewer1',
@@ -338,9 +346,10 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
             }
           },
           {
-            id: 'collab1',
-            collection: 'collaborators',
+            id: 'collaborators/collab1', // Compound key as used by ShareDB DurableStore
             payload: {
+              collection: 'collaborators', // Collection inside payload as per ShareDB
+              id: 'collab1',              // Document ID inside payload as per ShareDB
               manuscriptId: 'manuscript1',
               userId: 'editor1',
               role: 'editor',
@@ -372,7 +381,7 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
           Promise.all(verifyPromises)
             .then(function() {
               // Verify that encrypted fields were encrypted (for collaborators)
-              storage.readRecord('docs', 'collab1', function(payload) {
+              storage.readRecord('docs', 'collaborators/collab1', function(payload) {
                 expect(payload).to.exist;
                 // The encryptedFields should be decrypted when read
                 expect(payload.email).to.equal('editor@example.com');
@@ -441,18 +450,20 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
 
         // Write to different collections
         const userDoc = {
-          id:         'user1',
-          collection: 'users',
-          payload:    {
+          id:      'users/user1',  // Compound key as used by ShareDB DurableStore
+          payload: {
+            collection: 'users',   // Collection inside payload as per ShareDB
+            id:         'user1',   // Document ID inside payload as per ShareDB
             username: 'testuser',
             email:    'test@example.com',
           },
         };
 
         const postDoc = {
-          id:         'post1',
-          collection: 'posts',
-          payload:    {
+          id:      'posts/post1',  // Compound key as used by ShareDB DurableStore
+          payload: {
+            collection: 'posts',   // Collection inside payload as per ShareDB
+            id:         'post1',   // Document ID inside payload as per ShareDB
             title:     'Test Post',
             authorId:  'user1',
             createdAt: Date.now(),

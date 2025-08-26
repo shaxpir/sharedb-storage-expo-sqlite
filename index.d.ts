@@ -14,8 +14,12 @@ declare namespace ShareDBSQLiteStorage {
   type Callback<T = any> = (error: Error | null, result?: T) => void;
 
   interface StorageRecord {
-    id: string;
-    payload: any;
+    id: string;        // Compound key in format "collection/docId" as used by ShareDB DurableStore
+    payload: {
+      collection: string;    // Collection name (inside payload per ShareDB DurableStore)
+      id: string;           // Document ID (inside payload per ShareDB DurableStore)
+      [key: string]: any;   // Additional document data
+    };
   }
 
   interface StorageRecords {
