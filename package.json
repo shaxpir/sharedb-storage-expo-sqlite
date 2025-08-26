@@ -34,17 +34,18 @@
     "expo-sqlite": ">=14.0.0"
   },
   "dependencies": {
+    "@shaxpir/sharedb-storage-expo-sqlite": "^1.0.4",
     "generic-pool": "^3.9.0"
   },
   "devDependencies": {
+    "async": "^3.2.4",
     "better-sqlite3": "^12.2.0",
     "chai": "^4.3.7",
     "fake-indexeddb": "^6.1.0",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
     "sinon": "^15.2.0",
-    "sinon-chai": "^3.7.0",
-    "async": "^3.2.4"
+    "sinon-chai": "^3.7.0"
   },
   "files": [
     "lib/",
