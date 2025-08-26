@@ -178,7 +178,8 @@ import * as SQLite from 'expo-sqlite';
 import { 
   ExpoSqliteAdapter,
   SqliteStorage,
-  CollectionPerTableStrategy 
+  CollectionPerTableStrategy,
+  ShareDBStorage // Clean type import
 } from '@shaxpir/sharedb-storage-expo-sqlite';
 import { EncryptionManager } from '../utils/encryption';
 import { COLLECTION_CONFIG } from '../schema/socialMediaSchema';

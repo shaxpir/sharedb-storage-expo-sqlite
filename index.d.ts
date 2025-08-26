@@ -211,7 +211,17 @@ export const DefaultSchemaStrategy: ShareDBSQLiteStorage.DefaultSchemaStrategySt
 export const CollectionPerTableStrategy: ShareDBSQLiteStorage.CollectionPerTableStrategyStatic;
 export const StandardSQLiteConnectionPool: ShareDBSQLiteStorage.ConnectionPoolStatic;
 
-// Type exports
+// Direct type exports for better ergonomics
+export type ShareDBStorage = ShareDBSQLiteStorage.Storage;
+export type StorageRecord = ShareDBSQLiteStorage.StorageRecord;
+export type StorageRecords = ShareDBSQLiteStorage.StorageRecords;
+export type SqliteAdapter = ShareDBSQLiteStorage.SqliteAdapter;
+export type SqliteSchemaStrategy = ShareDBSQLiteStorage.SchemaStrategy;
+export type CollectionConfig = ShareDBSQLiteStorage.CollectionConfig;
+export type SqliteConnectionPool = ShareDBSQLiteStorage.ConnectionPool;
+export type StorageCallback<T = any> = ShareDBSQLiteStorage.Callback<T>;
+
+// Legacy namespace for backwards compatibility
 export namespace Types {
   export type Storage = ShareDBSQLiteStorage.Storage;
   export type StorageRecord = ShareDBSQLiteStorage.StorageRecord;
