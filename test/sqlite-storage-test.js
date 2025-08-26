@@ -142,6 +142,7 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
         },
         debug: false
       });
+      schemaStrategy.disableTransactions = true; // Disable transactions for this test
 
       const storage = new SqliteStorage({
         adapter: adapter,
@@ -273,6 +274,7 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
         },
         debug: false
       });
+      schemaStrategy.disableTransactions = true; // Disable transactions for this test
 
       const storage = new SqliteStorage({
         adapter: adapter,
@@ -608,6 +610,46 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
   });
 
   describe('Bug: deleteDatabase with custom schema strategy', function() {
+    it('should support flush control methods for bulk write optimization', function(done) {
+      const adapter = new NodeSqliteAdapter({debug: false});
+      const schemaStrategy = new CollectionPerTableStrategy({debug: false});
+      
+      const storage = new SqliteStorage({
+        adapter: adapter,
+        schemaStrategy: schemaStrategy,
+        dbFileName: testDbFile,
+        dbFileDir: testDbDir,
+        debug: false
+      });
+
+      storage.initialize(function(err) {
+        expect(err).to.be.null;
+
+        // Test that flush control methods exist and work
+        expect(typeof storage.setAutoBatchEnabled).to.equal('function');
+        expect(typeof storage.isAutoBatchEnabled).to.equal('function');
+        expect(typeof storage.flush).to.equal('function');
+
+        // Test initial state
+        expect(storage.isAutoBatchEnabled()).to.equal(true);
+
+        // Test disabling auto-batch
+        storage.setAutoBatchEnabled(false);
+        expect(storage.isAutoBatchEnabled()).to.equal(false);
+
+        // Test re-enabling auto-batch  
+        storage.setAutoBatchEnabled(true);
+        expect(storage.isAutoBatchEnabled()).to.equal(true);
+
+        // Test manual flush (should not throw)
+        storage.flush();
+
+        storage.close(function() {
+          done();
+        });
+      });
+    });
+
     it('should properly delegate deleteDatabase to schema strategy', function(done) {
       const adapter = new NodeSqliteAdapter({debug: false});
 
