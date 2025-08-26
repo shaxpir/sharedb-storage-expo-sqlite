@@ -48,7 +48,8 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
         debug:      false,
       });
 
-      storage.initialize(function(inventory) {
+      storage.initialize(function(err, inventory) {
+        expect(err).to.be.null;
         expect(inventory).to.exist;
         expect(inventory.payload).to.exist;
         expect(inventory.payload.collections).to.deep.equal({});
@@ -66,7 +67,8 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
         debug:      false,
       });
 
-      storage.initialize(function() {
+      storage.initialize(function(err) {
+        expect(err).to.be.null;
         const testDoc = {
           id:      'doc1',
           payload: {
@@ -95,7 +97,8 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
         debug:      false,
       });
 
-      storage.initialize(function() {
+      storage.initialize(function(err) {
+        expect(err).to.be.null;
         storage.updateInventory('posts', 'post1', 1, 'add', function(err) {
           expect(err).to.not.exist;
 
@@ -148,7 +151,8 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
         debug: false
       });
 
-      storage.initialize(function(inventory) {
+      storage.initialize(function(err, inventory) {
+        expect(err).to.be.null;
         console.log('Test: initialized, inventory:', inventory);
         expect(inventory).to.exist;
         
@@ -275,7 +279,8 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
         debug: false
       });
 
-      storage.initialize(function(inventory) {
+      storage.initialize(function(err, inventory) {
+        expect(err).to.be.null;
         expect(inventory).to.exist;
         
         // Test data for multiple collections
@@ -396,7 +401,8 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
         debug:          false,
       });
 
-      storage.initialize(function(inventory) {
+      storage.initialize(function(err, inventory) {
+        expect(err).to.be.null;
         expect(inventory).to.exist;
         expect(schemaStrategy.getInventoryType()).to.equal('json');
 
@@ -428,7 +434,8 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
         debug:          false,
       });
 
-      storage.initialize(function(inventory) {
+      storage.initialize(function(err, inventory) {
+        expect(err).to.be.null;
         expect(inventory).to.exist;
         expect(schemaStrategy.getInventoryType()).to.equal('table');
 
@@ -510,7 +517,8 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
         debug:          false,
       });
 
-      storage.initialize(function() {
+      storage.initialize(function(err) {
+        expect(err).to.be.null;
         const secretDoc = {
           id:      'secret1',
           payload: {
@@ -555,7 +563,8 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
         debug:      false,
       });
 
-      storage.initialize(function() {
+      storage.initialize(function(err) {
+        expect(err).to.be.null;
         expect(storage.isReady()).to.be.true;
         storage.close(done);
       });
@@ -598,7 +607,8 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
         debug:      false,
       });
 
-      storage.initialize(function() {
+      storage.initialize(function(err) {
+        expect(err).to.be.null;
         // Manually create an additional table that deleteDatabase won't know about
         adapter.run('CREATE TABLE IF NOT EXISTS custom_data (id TEXT PRIMARY KEY, content TEXT)', [], function(err) {
           expect(err).to.not.exist;

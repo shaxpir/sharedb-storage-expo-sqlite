@@ -71,7 +71,8 @@ describe('Dual Database Integration', function() {
       expect(storage.database).to.equal(mockDb);
       expect(storage.db).to.equal(mockDb);
 
-      storage.initialize(function() {
+      storage.initialize(function(err) {
+        expect(err).to.be.null;
         // Should not have tried to open a new database file
         const openQueries = mockDb.queries.filter(function(q) {
           return q.sql.includes('open') || q.sql.includes('ATTACH');
@@ -88,7 +89,8 @@ describe('Dual Database Integration', function() {
         debug:    true,
       });
 
-      storage.initialize(function() {
+      storage.initialize(function(err) {
+        expect(err).to.be.null;
         // Close storage - should not close the database
         storage._storage.adapter.closeDatabase(function() {
           expect(mockDb._closed).to.be.false;
@@ -106,7 +108,8 @@ describe('Dual Database Integration', function() {
         debug:        true,
       });
 
-      storage.initialize(function() {
+      storage.initialize(function(err) {
+        expect(err).to.be.null;
         // Check that CREATE TABLE statements use prefixed table names
         const createQueries = mockDb.queries.filter(function(q) {
           return q.sql.includes('CREATE TABLE');
@@ -135,7 +138,8 @@ describe('Dual Database Integration', function() {
         debug:        true,
       });
 
-      storage.initialize(function() {
+      storage.initialize(function(err) {
+        expect(err).to.be.null;
         storage.readRecord('docs', 'test-id', function(error, result) {
           // Check that SELECT query uses prefixed table name
           const selectQueries = mockDb.queries.filter(function(q) {
@@ -171,7 +175,8 @@ describe('Dual Database Integration', function() {
       expect(storage.getTableName('docs')).to.equal('userdata.term');
       expect(storage.getTableName('__meta__')).to.equal('userdata.session_meta');
 
-      storage.initialize(function() {
+      storage.initialize(function(err) {
+        expect(err).to.be.null;
         // Check that CREATE TABLE statements use mapped table names
         const createQueries = mockDb.queries.filter(function(q) {
           return q.sql.includes('CREATE TABLE');
@@ -237,7 +242,8 @@ describe('Dual Database Integration', function() {
         {data: '{"text":"谢谢"}', translation: 'thank you'},
       ]);
 
-      storage.initialize(function() {
+      storage.initialize(function(err) {
+        expect(err).to.be.null;
         storage.executeCrossDbQuery(query, [], function(error, results) {
           expect(error).to.be.null;
           expect(results).to.be.an('array');
@@ -275,7 +281,8 @@ describe('Dual Database Integration', function() {
         debug:                true,
       });
 
-      storage.initialize(function() {
+      storage.initialize(function(err) {
+        expect(err).to.be.null;
         storage.getStats(function(error, stats) {
           expect(error).to.be.null;
           expect(stats.schemaPrefix).to.equal('userdata');
@@ -310,7 +317,8 @@ describe('Dual Database Integration', function() {
         debug:                true,
       });
 
-      storage.initialize(function() {
+      storage.initialize(function(err) {
+        expect(err).to.be.null;
         // Verify table creation uses the correct mapping
         const createQueries = mockDb.queries.filter(function(q) {
           return q.sql.includes('CREATE TABLE');
@@ -359,7 +367,8 @@ describe('Dual Database Integration', function() {
         debug: true,
       });
 
-      storage.initialize(function() {
+      storage.initialize(function(err) {
+        expect(err).to.be.null;
         // Verify table mapping works correctly
         expect(storage.getTableName('docs')).to.equal('userdata.docs');
         expect(storage.getTableName('__meta__')).to.equal('userdata.meta');

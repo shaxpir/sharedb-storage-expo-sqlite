@@ -305,7 +305,8 @@ describe('Architectural Validation - SQLite Storage', function() {
         }, 10);
       };
 
-      storage.initialize(function(initError) {
+      storage.initialize(function(err) {
+        expect(err).to.be.null;
         expect(initError).to.not.exist;
         
         const testRecord = {
@@ -328,7 +329,8 @@ describe('Architectural Validation - SQLite Storage', function() {
         debug: false
       });
 
-      storage.initialize(function(initError) {
+      storage.initialize(function(err) {
+        expect(err).to.be.null;
         expect(initError).to.not.exist;
         
         // Test the db wrapper's promise chaining by doing nested operations
@@ -423,7 +425,8 @@ describe('Architectural Validation - SQLite Storage', function() {
         debug: false
       });
 
-      storage.initialize(function(initError) {
+      storage.initialize(function(err) {
+        expect(err).to.be.null;
         expect(initError).to.not.exist;
         
         // Verify that user collections named 'meta' and 'inventory' 
