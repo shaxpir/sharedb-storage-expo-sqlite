@@ -11,7 +11,16 @@ declare namespace ShareDBSQLiteStorage {
   // Core Types
   // ===============================
 
-  type Callback<T = any> = (error: Error | null, result?: T) => void;
+  type Callback<T = void> = (error: Error | null, result?: T) => void;
+
+  // Database connection types
+  type SqlParameters = (string | number | boolean | null | Buffer)[];
+  
+  interface DatabaseConnection {
+    runAsync(sql: string, params?: SqlParameters): Promise<any>;
+    getFirstAsync(sql: string, params?: SqlParameters): Promise<any>;
+    getAllAsync(sql: string, params?: SqlParameters): Promise<any[]>;
+  }
 
   interface StorageRecord {
     id: string;        // Compound key in format "collection/docId" as used by ShareDB DurableStore
@@ -29,7 +38,7 @@ declare namespace ShareDBSQLiteStorage {
 
   interface Storage {
     initialize(callback: Callback): void;
-    readRecord(storeName: string, id: string, callback: Callback<any>): void;
+    readRecord(storeName: string, id: string, callback: Callback<any>): void; // Returns document payload (any structure)
     readAllRecords(storeName: string, callback: Callback<StorageRecord[]>): void;
     readRecordsBulk?(storeName: string, ids: string[], callback: Callback<StorageRecord[]>): void;
     writeRecords(records: StorageRecords, callback: Callback): void;
@@ -73,25 +82,42 @@ declare namespace ShareDBSQLiteStorage {
 
     openDatabase(callback: Callback): void;
     closeDatabase(callback: Callback): void;
-    run(sql: string, params: any[], callback: Callback): void;
-    get(sql: string, params: any[], callback: Callback): void;
-    all(sql: string, params: any[], callback: Callback): void;
+    run(sql: string, params: SqlParameters, callback: Callback): void;
+    get(sql: string, params: SqlParameters, callback: Callback<any>): void;
+    all(sql: string, params: SqlParameters, callback: Callback<any[]>): void;
     getType(): string;
   }
 
   interface BaseSqliteAdapter extends SqliteAdapter {}
 
+  // Expo SQLite database interface (from expo-sqlite)
+  interface ExpoSQLiteDatabase {
+    runAsync(sql: string, params?: SqlParameters): Promise<{ lastInsertRowId: number; changes: number }>;
+    getFirstAsync(sql: string, params?: SqlParameters): Promise<any>;
+    getAllAsync(sql: string, params?: SqlParameters): Promise<any[]>;
+    withTransactionAsync<T>(task: () => Promise<T>): Promise<T>;
+    closeAsync(): Promise<void>;
+  }
+
+  // Node SQLite database interface (better-sqlite3 or sqlite3)
+  interface NodeSQLiteDatabase {
+    prepare?(statement: string): any;
+    exec?(sql: string): void;
+    close?(): void;
+    [key: string]: any; // For compatibility with different SQLite libraries
+  }
+
   interface BaseSqliteAdapterStatic {
-    new (options?: any): BaseSqliteAdapter;
+    new (options?: Record<string, any>): BaseSqliteAdapter;
   }
 
   interface ExpoSqliteAdapterOptions {
-    database: any; // Expo SQLite database instance
+    database: ExpoSQLiteDatabase;
     debug?: boolean;
   }
 
   interface ExpoSqliteAdapter extends SqliteAdapter {
-    readonly database: any;
+    readonly database: ExpoSQLiteDatabase;
   }
 
   interface ExpoSqliteAdapterStatic {
@@ -103,7 +129,7 @@ declare namespace ShareDBSQLiteStorage {
   }
 
   interface NodeSqliteAdapter extends SqliteAdapter {
-    readonly db: any; // better-sqlite3 or sqlite3 database instance
+    readonly db: NodeSQLiteDatabase;
   }
 
   interface NodeSqliteAdapterStatic {
@@ -127,20 +153,20 @@ declare namespace ShareDBSQLiteStorage {
   }
 
   interface SchemaStrategy {
-    initializeSchema(db: any, callback: Callback): void;
-    validateSchema(db: any, callback: Callback): void;
-    writeRecords(db: any, records: StorageRecords, callback: Callback): void;
-    readRecord(db: any, type: string, id: string, collection?: string, callback?: Callback): void;
-    readAllRecords(db: any, type: string, collection?: string, callback?: Callback): void;
-    readRecordsBulk?(db: any, type: string, collection: string, ids: string[], callback: Callback<StorageRecord[]>): void;
-    deleteRecord(db: any, type: string, id: string, collection?: string, callback?: Callback): void;
-    clearStore(db: any, storeName: string, callback: Callback): void;
-    clearAll(db: any, callback: Callback): void;
-    updateInventoryItem(db: any, collection: string, docId: string, version: number, operation: string, callback: Callback): void;
-    readInventory(db: any, callback: Callback): void;
-    initializeInventory(db: any, callback: Callback): void;
+    initializeSchema(db: DatabaseConnection, callback: Callback): void;
+    validateSchema(db: DatabaseConnection, callback: Callback<boolean>): void;
+    writeRecords(db: DatabaseConnection, records: StorageRecords, callback: Callback): void;
+    readRecord(db: DatabaseConnection, type: string, id: string, collection?: string, callback?: Callback<StorageRecord | null>): void;
+    readAllRecords(db: DatabaseConnection, type: string, collection?: string, callback?: Callback<StorageRecord[]>): void;
+    readRecordsBulk?(db: DatabaseConnection, type: string, collection: string, ids: string[], callback: Callback<StorageRecord[]>): void;
+    deleteRecord(db: DatabaseConnection, type: string, id: string, collection?: string, callback?: Callback): void;
+    clearStore(db: DatabaseConnection, storeName: string, callback: Callback): void;
+    clearAll(db: DatabaseConnection, callback: Callback): void;
+    updateInventoryItem(db: DatabaseConnection, collection: string, docId: string, version: number | string, operation: string, callback: Callback): void;
+    readInventory(db: DatabaseConnection, callback: Callback<StorageRecord>): void;
+    initializeInventory(db: DatabaseConnection, callback: Callback<StorageRecord>): void;
     getInventoryType(): string;
-    deleteAllTables(db: any, callback: Callback): void;
+    deleteAllTables(db: DatabaseConnection, callback: Callback): void;
   }
 
   interface BaseSchemaStrategy extends SchemaStrategy {}
@@ -165,7 +191,7 @@ declare namespace ShareDBSQLiteStorage {
     readonly collectionConfig: { [collection: string]: CollectionConfig };
     
     getTableName(collection: string): string;
-    ensureCollectionTable(db: any, collection: string, callback: Callback): void;
+    ensureCollectionTable(db: DatabaseConnection, collection: string, callback: Callback): void;
   }
 
   interface CollectionPerTableStrategyStatic {
@@ -177,7 +203,7 @@ declare namespace ShareDBSQLiteStorage {
   // ===============================
 
   interface ConnectionPoolOptions {
-    createConnection: () => Promise<any> | any;
+    createConnection: () => Promise<DatabaseConnection> | DatabaseConnection;
     minConnections?: number;
     maxConnections?: number;
     acquireTimeoutMillis?: number;
@@ -186,8 +212,8 @@ declare namespace ShareDBSQLiteStorage {
   }
 
   interface ConnectionPool {
-    acquire(): Promise<any>;
-    release(connection: any): Promise<void>;
+    acquire(): Promise<DatabaseConnection>;
+    release(connection: DatabaseConnection): Promise<void>;
     drain(): Promise<void>;
     clear(): Promise<void>;
     size: number;
@@ -223,7 +249,7 @@ export type SqliteAdapter = ShareDBSQLiteStorage.SqliteAdapter;
 export type SqliteSchemaStrategy = ShareDBSQLiteStorage.SchemaStrategy;
 export type CollectionConfig = ShareDBSQLiteStorage.CollectionConfig;
 export type SqliteConnectionPool = ShareDBSQLiteStorage.ConnectionPool;
-export type StorageCallback<T = any> = ShareDBSQLiteStorage.Callback<T>;
+export type StorageCallback<T = void> = ShareDBSQLiteStorage.Callback<T>;
 
 // Legacy namespace for backwards compatibility
 export namespace Types {
@@ -234,5 +260,5 @@ export namespace Types {
   export type SchemaStrategy = ShareDBSQLiteStorage.SchemaStrategy;
   export type CollectionConfig = ShareDBSQLiteStorage.CollectionConfig;
   export type ConnectionPool = ShareDBSQLiteStorage.ConnectionPool;
-  export type Callback<T = any> = ShareDBSQLiteStorage.Callback<T>;
+  export type Callback<T = void> = ShareDBSQLiteStorage.Callback<T>;
 }
