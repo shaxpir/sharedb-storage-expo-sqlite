@@ -13,7 +13,6 @@ module.exports = {
   DefaultSchemaStrategy:        DefaultSchemaStrategy,
   CollectionPerTableStrategy:   CollectionPerTableStrategy,
   SqliteStorage:                SqliteStorage,
+  // Default export is the main storage class
+  default:                      ExpoSqliteStorage,
 };
-
-// Default export is the main storage class
-module.exports.default = ExpoSqliteStorage;
