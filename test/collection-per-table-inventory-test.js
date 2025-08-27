@@ -52,10 +52,12 @@ describe('CollectionPerTableStrategy Inventory Management', function() {
       schemaStrategy: schemaStrategy,
       dbFileName: testDbFile,
       dbFileDir: testDbDir,
-      debug: false
+      debug: true
     });
 
+    console.log('Initializing storage...');
     storage.initialize(function(err, inventory) {
+      console.log('Initialize callback, err:', err, 'inventory:', inventory);
       expect(err).to.be.null;
       expect(inventory).to.exist;
       
@@ -98,11 +100,11 @@ describe('CollectionPerTableStrategy Inventory Management', function() {
           
           // Verify term entry in inventory
           expect(inv.payload.collections.term).to.exist;
-          expect(inv.payload.collections.term['term/term1']).to.equal(1);
+          expect(inv.payload.collections.term['term/term1']).to.deep.equal({v: 1, p: false});
           
           // Verify session entry in inventory
           expect(inv.payload.collections.session).to.exist;
-          expect(inv.payload.collections.session['session/session1']).to.equal(1);
+          expect(inv.payload.collections.session['session/session1']).to.deep.equal({v: 1, p: false});
 
           storage.close(done);
         });
@@ -281,7 +283,7 @@ describe('CollectionPerTableStrategy Inventory Management', function() {
           // Check inventory was updated with new version
           storage.readInventory(function(invErr, inv) {
             expect(invErr).to.not.exist;
-            expect(inv.payload.collections.term['term/term1']).to.equal(2);
+            expect(inv.payload.collections.term['term/term1']).to.deep.equal({v: 2, p: false});
 
             storage.close(done);
           });
