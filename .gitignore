@@ -96,3 +96,7 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# Test databases (generated during tests)
+test/test-databases/*.db
+test/test-databases/*.sqlite
