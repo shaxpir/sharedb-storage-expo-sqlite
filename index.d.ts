@@ -130,6 +130,9 @@ declare namespace ShareDBSQLiteStorage {
 
   interface NodeSqliteAdapter extends SqliteAdapter {
     readonly db: NodeSQLiteDatabase;
+    
+    // Override openDatabase to match NodeSqliteAdapter's actual implementation
+    openDatabase(dbFileName: string, options?: any, dbFileDir?: string, callback?: (err: any) => void): void;
   }
 
   interface NodeSqliteAdapterStatic {
