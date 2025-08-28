@@ -5,48 +5,26 @@
 /// <reference types="node" />
 
 import { EventEmitter } from 'events';
+import { Types as ShareDBStorageTypes } from '@shaxpir/sharedb/lib/client/storage';
 
 declare namespace ShareDBSQLiteStorage {
   // ===============================
-  // Core Types
+  // Core Types - Using Centralized ShareDB Types
   // ===============================
 
-  type Callback<T = void> = (error: Error | null, result?: T) => void;
+  // Use centralized types from main ShareDB package
+  type Storage = ShareDBStorageTypes.Storage;
+  type StorageRecord = ShareDBStorageTypes.StorageRecord;
+  type StorageRecords = ShareDBStorageTypes.StorageRecords;
+  type Callback<T = any> = ShareDBStorageTypes.Callback<T>;
 
-  // Database connection types
+  // Database connection types (platform-specific)
   type SqlParameters = (string | number | boolean | null | Buffer)[];
   
   interface DatabaseConnection {
     runAsync(sql: string, params?: SqlParameters): Promise<any>;
     getFirstAsync(sql: string, params?: SqlParameters): Promise<any>;
     getAllAsync(sql: string, params?: SqlParameters): Promise<any[]>;
-  }
-
-  interface StorageRecord {
-    id: string;        // Compound key in format "collection/docId" as used by ShareDB DurableStore
-    payload: {
-      collection: string;    // Collection name (inside payload per ShareDB DurableStore)
-      id: string;           // Document ID (inside payload per ShareDB DurableStore)
-      [key: string]: any;   // Additional document data
-    };
-  }
-
-  interface StorageRecords {
-    docs?: StorageRecord | StorageRecord[];
-    meta?: StorageRecord | StorageRecord[];
-  }
-
-  interface Storage {
-    initialize(callback: Callback): void;
-    readRecord(storeName: string, id: string, callback: Callback<any>): void; // Returns document payload (any structure)
-    readAllRecords(storeName: string, callback: Callback<StorageRecord[]>): void;
-    readRecordsBulk?(storeName: string, ids: string[], callback: Callback<StorageRecord[]>): void;
-    writeRecords(records: StorageRecords, callback: Callback): void;
-    deleteRecord(storeName: string, id: string, callback: Callback): void;
-    clearStore(storeName: string, callback: Callback): void;
-    clearAll(callback: Callback): void;
-    close?(callback: Callback): void;
-    isReady?(): boolean;
   }
 
   // ===============================
@@ -193,8 +171,8 @@ declare const SqliteStorage: ShareDBSQLiteStorage.SqliteStorageStatic & {
 };
 
 
-// Direct type exports for better ergonomics
-export type ShareDBStorage = ShareDBSQLiteStorage.Storage;
+// Direct type exports for better ergonomics - using centralized ShareDB types
+export type ShareDBStorage = ShareDBStorageTypes.Storage;
 export type StorageRecord = ShareDBSQLiteStorage.StorageRecord;
 export type StorageRecords = ShareDBSQLiteStorage.StorageRecords;
 export type SqliteAdapter = ShareDBSQLiteStorage.SqliteAdapter;
