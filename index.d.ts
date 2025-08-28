@@ -5,18 +5,23 @@
 /// <reference types="node" />
 
 import { EventEmitter } from 'events';
-import { Types as ShareDBStorageTypes } from '@shaxpir/sharedb/lib/client/storage';
+import { 
+  DurableStorage, 
+  DurableStorageRecord, 
+  DurableStorageRecords, 
+  DurableStorageCallback 
+} from '@shaxpir/sharedb';
 
 declare namespace ShareDBSQLiteStorage {
   // ===============================
-  // Core Types - Using Centralized ShareDB Types
+  // Core Types - Re-exported from ShareDB
   // ===============================
 
-  // Use centralized types from main ShareDB package
-  type Storage = ShareDBStorageTypes.Storage;
-  type StorageRecord = ShareDBStorageTypes.StorageRecord;
-  type StorageRecords = ShareDBStorageTypes.StorageRecords;
-  type Callback<T = any> = ShareDBStorageTypes.Callback<T>;
+  // Clean re-exports with no renaming needed
+  type Storage = DurableStorage;
+  type StorageRecord = DurableStorageRecord;
+  type StorageRecords = DurableStorageRecords;
+  type Callback<T = any> = DurableStorageCallback<T>;
 
   // Database connection types (platform-specific)
   type SqlParameters = (string | number | boolean | null | Buffer)[];
@@ -171,22 +176,34 @@ declare const SqliteStorage: ShareDBSQLiteStorage.SqliteStorageStatic & {
 };
 
 
-// Direct type exports for better ergonomics - using centralized ShareDB types
-export type ShareDBStorage = ShareDBStorageTypes.Storage;
-export type StorageRecord = ShareDBSQLiteStorage.StorageRecord;
-export type StorageRecords = ShareDBSQLiteStorage.StorageRecords;
+// ===============================
+// Main Interface Exports - Clean Names
+// ===============================
+
+// Core ShareDB interfaces (re-exported, no renaming)
+export type { DurableStorage, DurableStorageRecord, DurableStorageRecords, DurableStorageCallback };
+
+// Platform-specific SQLite interfaces
 export type SqliteAdapter = ShareDBSQLiteStorage.SqliteAdapter;
 export type SqliteSchemaStrategy = ShareDBSQLiteStorage.SchemaStrategy;
 export type CollectionConfig = ShareDBSQLiteStorage.CollectionConfig;
-export type StorageCallback<T = void> = ShareDBSQLiteStorage.Callback<T>;
 
-// Legacy namespace for backwards compatibility
+// ===============================
+// Legacy Exports (DEPRECATED - use direct imports)
+// ===============================
 export namespace Types {
-  export type Storage = ShareDBSQLiteStorage.Storage;
-  export type StorageRecord = ShareDBSQLiteStorage.StorageRecord;
-  export type StorageRecords = ShareDBSQLiteStorage.StorageRecords;
+  /** @deprecated Import DurableStorage directly */
+  export type Storage = DurableStorage;
+  /** @deprecated Import DurableStorageRecord directly */
+  export type StorageRecord = DurableStorageRecord;
+  /** @deprecated Import DurableStorageRecords directly */
+  export type StorageRecords = DurableStorageRecords;
+  /** @deprecated Import SqliteAdapter directly */
   export type SqliteAdapter = ShareDBSQLiteStorage.SqliteAdapter;
-  export type SchemaStrategy = ShareDBSQLiteStorage.SchemaStrategy;
+  /** @deprecated Import SqliteSchemaStrategy directly */
+  export type SchemaStrategy = SqliteSchemaStrategy;
+  /** @deprecated Import CollectionConfig directly */
   export type CollectionConfig = ShareDBSQLiteStorage.CollectionConfig;
-  export type Callback<T = void> = ShareDBSQLiteStorage.Callback<T>;
+  /** @deprecated Import DurableStorageCallback directly */
+  export type Callback<T = any> = DurableStorageCallback<T>;
 }
