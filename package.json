@@ -1,6 +1,6 @@
 {
   "name": "@shaxpir/sharedb-storage-expo-sqlite",
-  "version": "1.1.2",
+  "version": "2.0.0",
   "description": "Expo SQLite storage adapter for ShareDB with dual-database and connection pooling support",
   "main": "index.js",
   "types": "index.d.ts",
@@ -39,7 +39,6 @@
   },
   "devDependencies": {
     "async": "^3.2.4",
-    "better-sqlite3": "^12.2.0",
     "chai": "^4.3.7",
     "fake-indexeddb": "^6.1.0",
     "mocha": "^10.2.0",
@@ -57,10 +56,8 @@
     "PROJECT_PLAN.md"
   ],
   "scripts": {
-    "test": "mocha",
-    "test-cover": "nyc --temp-dir=coverage -r text -r lcov npm test",
-    "prepare": "npm test",
-    "prepack": "npm test"
+    "test": "echo 'Tests run in Node.js package only'",
+    "test-cover": "echo 'Tests run in Node.js package only'"
   },
   "mocha": {
     "recursive": true,
