@@ -1,12 +1,12 @@
 const expect = require('chai').expect;
 const SqliteStorage = require('../lib/sqlite-storage');
-const NodeSqliteAdapter = require('../lib/adapters/node-sqlite-adapter');
+const BetterSqliteAdapter = require('../lib/adapters/better-sqlite-adapter');
 const DefaultSchemaStrategy = require('../lib/schema/default-schema-strategy');
 const CollectionPerTableStrategy = require('../lib/schema/collection-per-table-strategy');
 const fs = require('fs');
 const path = require('path');
 
-describe('SqliteStorage with NodeSqliteAdapter', function() {
+describe('SqliteStorage with BetterSqliteAdapter', function() {
   const testDbDir = path.join(__dirname, 'test-dbs');
   const testDbFile = 'test.db';
   const testDbPath = path.join(testDbDir, testDbFile);
@@ -39,8 +39,8 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
   });
 
   describe('Basic functionality', function() {
-    it('should initialize with NodeSqliteAdapter', function(done) {
-      const adapter = new NodeSqliteAdapter({debug: false});
+    it('should initialize with BetterSqliteAdapter', function(done) {
+      const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
       const storage = new SqliteStorage({
         adapter:    adapter,
         dbFileName: testDbFile,
@@ -59,7 +59,7 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
     });
 
     it('should write and read records', function(done) {
-      const adapter = new NodeSqliteAdapter({debug: false});
+      const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
       const storage = new SqliteStorage({
         adapter:    adapter,
         dbFileName: testDbFile,
@@ -89,7 +89,7 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
     });
 
     it('should update and read inventory', function(done) {
-      const adapter = new NodeSqliteAdapter({debug: false});
+      const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
       const storage = new SqliteStorage({
         adapter:    adapter,
         dbFileName: testDbFile,
@@ -122,7 +122,7 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
 
   describe('Schema strategies', function() {
     it('should handle potential namespace collisions with system tables', function(done) {
-      const adapter = new NodeSqliteAdapter({debug: false});
+      const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
       
       // Test with collection names that could collide with system tables
       const schemaStrategy = new CollectionPerTableStrategy({
@@ -227,7 +227,7 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
     });
 
     it('should work with CollectionPerTableStrategy with realistic collections', function(done) {
-      const adapter = new NodeSqliteAdapter({debug: false});
+      const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
       
       // Realistic collection configuration for a writing platform
       const schemaStrategy = new CollectionPerTableStrategy({
@@ -399,7 +399,7 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
     });
 
     it('should work with DefaultSchemaStrategy', function(done) {
-      const adapter = new NodeSqliteAdapter({debug: false});
+      const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
       const schemaStrategy = new DefaultSchemaStrategy({
         debug: false,
       });
@@ -422,7 +422,7 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
     });
 
     it('should work with CollectionPerTableStrategy', function(done) {
-      const adapter = new NodeSqliteAdapter({debug: false});
+      const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
       const schemaStrategy = new CollectionPerTableStrategy({
         collectionConfig: {
           'users': {
@@ -490,7 +490,7 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
 
   describe('Encryption support', function() {
     it('should encrypt and decrypt records', function(done) {
-      const adapter = new NodeSqliteAdapter({debug: false});
+      const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
 
       // Simple XOR encryption for testing
       const encryptionKey = 'test-key';
@@ -548,13 +548,14 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
             expect(payload).to.deep.equal(secretDoc.payload);
 
             // Verify it's actually encrypted in the database
-            adapter.get('SELECT data FROM docs WHERE id = ?', ['secret1'], function(err2, row) {
-              expect(err2).to.not.exist;
+            adapter.getFirstAsync('SELECT data FROM docs WHERE id = ?', ['secret1']).then(function(row) {
               const stored = JSON.parse(row.data);
               expect(stored.encrypted_payload).to.exist;
               expect(stored.payload).to.not.exist;
 
               storage.close(done);
+            }).catch(function(err2) {
+              done(err2);
             });
           });
         });
@@ -562,31 +563,10 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
     });
   });
 
-  describe('Adapter compatibility', function() {
-    it('should support different SQLite implementations', function(done) {
-      const adapter = new NodeSqliteAdapter({debug: false});
-
-      expect(adapter.getType()).to.include('node-sqlite');
-      expect(adapter.getType()).to.match(/(better-sqlite3|sqlite3)/);
-
-      const storage = new SqliteStorage({
-        adapter:    adapter,
-        dbFileName: testDbFile,
-        dbFileDir:  testDbDir,
-        debug:      false,
-      });
-
-      storage.initialize(function(err) {
-        expect(err).to.be.null;
-        expect(storage.isReady()).to.be.true;
-        storage.close(done);
-      });
-    });
-  });
 
   describe('Storage Interface', function() {
     it('should have expected storage interface methods', function(done) {
-      const sqliteAdapter = new NodeSqliteAdapter({debug: false});
+      const sqliteAdapter = new BetterSqliteAdapter(testDbPath, {debug: false});
       const sqliteStorage = new SqliteStorage({
         adapter:    sqliteAdapter,
         dbFileName: testDbFile,
@@ -611,7 +591,7 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
 
   describe('Bug: deleteDatabase with custom schema strategy', function() {
     it('should support flush control methods for bulk write optimization', function(done) {
-      const adapter = new NodeSqliteAdapter({debug: false});
+      const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
       const schemaStrategy = new CollectionPerTableStrategy({debug: false});
       
       const storage = new SqliteStorage({
@@ -651,7 +631,7 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
     });
 
     it('should properly delegate deleteDatabase to schema strategy', function(done) {
-      const adapter = new NodeSqliteAdapter({debug: false});
+      const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
 
       const storage = new SqliteStorage({
         adapter:    adapter,
@@ -663,51 +643,53 @@ describe('SqliteStorage with NodeSqliteAdapter', function() {
       storage.initialize(function(err) {
         expect(err).to.be.null;
         // Manually create an additional table that deleteDatabase won't know about
-        adapter.run('CREATE TABLE IF NOT EXISTS custom_data (id TEXT PRIMARY KEY, content TEXT)', [], function(err) {
-          expect(err).to.not.exist;
-
+        adapter.runAsync('CREATE TABLE IF NOT EXISTS custom_data (id TEXT PRIMARY KEY, content TEXT)', []).then(function() {
           // Insert test data in the custom table
           const insertSql = 'INSERT INTO custom_data (id, content) VALUES (?, ?)';
-          adapter.run(insertSql, ['test1', 'custom content'], function(err2) {
-            expect(err2).to.not.exist;
+          return adapter.runAsync(insertSql, ['test1', 'custom content']);
+        }).then(function() {
+          // Also insert standard data
+          const testDoc = {id: 'doc1', payload: {title: 'Test Document'}};
+          storage.writeRecords({docs: [testDoc]}, function(err3) {
+            expect(err3).to.not.exist;
 
-            // Also insert standard data
-            const testDoc = {id: 'doc1', payload: {title: 'Test Document'}};
-            storage.writeRecords({docs: [testDoc]}, function(err3) {
-              expect(err3).to.not.exist;
+            // Verify both exist
+            adapter.getFirstAsync('SELECT * FROM custom_data WHERE id = ?', ['test1']).then(function(customRow) {
+              expect(customRow).to.exist;
+              expect(customRow.content).to.equal('custom content');
 
-              // Verify both exist
-              adapter.get('SELECT * FROM custom_data WHERE id = ?', ['test1'], function(err4, customRow) {
-                expect(err4).to.not.exist;
-                expect(customRow).to.exist;
-                expect(customRow.content).to.equal('custom content');
+              storage.readRecord('docs', 'doc1', function(payload) {
+                expect(payload).to.exist;
+                expect(payload.title).to.equal('Test Document');
 
-                storage.readRecord('docs', 'doc1', function(payload) {
-                  expect(payload).to.exist;
-                  expect(payload.title).to.equal('Test Document');
+                // Now call deleteDatabase - it should delete all schema strategy tables
+                storage.deleteDatabase(function() {
+                  // Check if standard docs table was deleted (should be)
+                  storage.readRecord('docs', 'doc1', function(payload2) {
+                    expect(payload2).to.not.exist; // Standard table was deleted
 
-                  // Now call deleteDatabase - it should delete all schema strategy tables
-                  storage.deleteDatabase(function() {
-                    // Check if standard docs table was deleted (should be)
-                    storage.readRecord('docs', 'doc1', function(payload2) {
-                      expect(payload2).to.not.exist; // Standard table was deleted
+                    // After the fix: custom_data table should also be deleted
+                    // because schema strategy now properly manages all tables
+                    adapter.getFirstAsync('SELECT * FROM custom_data WHERE id = ?', ['test1']).then(function(customRow2) {
+                      // Note: custom_data was created manually, so it won't be deleted by DefaultSchemaStrategy
+                      // This demonstrates the fix works for schema-managed tables,
+                      // but manual tables would need to be handled separately
 
-                      // After the fix: custom_data table should also be deleted
-                      // because schema strategy now properly manages all tables
-                      adapter.get('SELECT * FROM custom_data WHERE id = ?', ['test1'], function(err5, customRow2) {
-                        // Note: custom_data was created manually, so it won't be deleted by DefaultSchemaStrategy
-                        // This demonstrates the fix works for schema-managed tables,
-                        // but manual tables would need to be handled separately
-
-                        // The fix means schema strategy methods are called correctly
-                        storage.close(done);
-                      });
+                      // The fix means schema strategy methods are called correctly
+                      storage.close(done);
+                    }).catch(function(err5) {
+                      // Table might not exist after deleteDatabase - that's expected
+                      storage.close(done);
                     });
                   });
                 });
               });
+            }).catch(function(err4) {
+              done(err4);
             });
           });
+        }).catch(function(err) {
+          done(err);
         });
       });
     });

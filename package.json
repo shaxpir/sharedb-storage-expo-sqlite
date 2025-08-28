@@ -31,7 +31,8 @@
   },
   "peerDependencies": {
     "@shaxpir/sharedb": ">=6.0.0",
-    "expo-sqlite": ">=14.0.0"
+    "expo-sqlite": ">=14.0.0",
+    "expo-file-system": ">=17.0.0"
   },
   "dependencies": {
     "generic-pool": "^3.9.0"

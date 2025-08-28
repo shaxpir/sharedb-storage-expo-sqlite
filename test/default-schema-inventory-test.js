@@ -2,7 +2,7 @@ const expect = require('chai').expect;
 const path = require('path');
 const fs = require('fs');
 const SqliteStorage = require('../lib/sqlite-storage');
-const NodeSqliteAdapter = require('../lib/adapters/node-sqlite-adapter');
+const BetterSqliteAdapter = require('../lib/adapters/better-sqlite-adapter');
 const DefaultSchemaStrategy = require('../lib/schema/default-schema-strategy');
 
 describe('DefaultSchemaStrategy Inventory Management', function() {
@@ -31,7 +31,7 @@ describe('DefaultSchemaStrategy Inventory Management', function() {
   });
 
   it('should properly maintain inventory when writing documents', function(done) {
-    const adapter = new NodeSqliteAdapter({debug: false});
+    const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
     const schemaStrategy = new DefaultSchemaStrategy({
       debug: false
     });
@@ -90,7 +90,7 @@ describe('DefaultSchemaStrategy Inventory Management', function() {
   });
 
   it('should find documents when collection is not specified', function(done) {
-    const adapter = new NodeSqliteAdapter({debug: false});
+    const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
     const schemaStrategy = new DefaultSchemaStrategy({
       debug: false
     });
@@ -134,7 +134,7 @@ describe('DefaultSchemaStrategy Inventory Management', function() {
   });
 
   it('should return null for non-existent documents', function(done) {
-    const adapter = new NodeSqliteAdapter({debug: false});
+    const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
     const schemaStrategy = new DefaultSchemaStrategy({
       debug: false
     });
@@ -160,7 +160,7 @@ describe('DefaultSchemaStrategy Inventory Management', function() {
   });
 
   it('should handle documents without collection field', function(done) {
-    const adapter = new NodeSqliteAdapter({debug: false});
+    const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
     const schemaStrategy = new DefaultSchemaStrategy({
       debug: false
     });
@@ -204,7 +204,7 @@ describe('DefaultSchemaStrategy Inventory Management', function() {
   });
 
   it('should update inventory when documents are updated', function(done) {
-    const adapter = new NodeSqliteAdapter({debug: false});
+    const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
     const schemaStrategy = new DefaultSchemaStrategy({
       debug: false
     });
@@ -254,7 +254,7 @@ describe('DefaultSchemaStrategy Inventory Management', function() {
   });
 
   it('should handle bulk reads', function(done) {
-    const adapter = new NodeSqliteAdapter({debug: false});
+    const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
     const schemaStrategy = new DefaultSchemaStrategy({
       debug: false
     });
@@ -318,7 +318,7 @@ describe('DefaultSchemaStrategy Inventory Management', function() {
   });
 
   it('should properly clean up inventory when documents are deleted', function(done) {
-    const adapter = new NodeSqliteAdapter({debug: false});
+    const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
     const schemaStrategy = new DefaultSchemaStrategy({
       debug: false
     });
@@ -370,7 +370,7 @@ describe('DefaultSchemaStrategy Inventory Management', function() {
   });
 
   it('should handle updateInventory calls directly', function(done) {
-    const adapter = new NodeSqliteAdapter({debug: false});
+    const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
     const schemaStrategy = new DefaultSchemaStrategy({
       debug: false
     });

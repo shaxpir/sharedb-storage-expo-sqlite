@@ -2,7 +2,7 @@ const expect = require('chai').expect;
 const path = require('path');
 const fs = require('fs');
 const SqliteStorage = require('../lib/sqlite-storage');
-const NodeSqliteAdapter = require('../lib/adapters/node-sqlite-adapter');
+const BetterSqliteAdapter = require('../lib/adapters/better-sqlite-adapter');
 const DefaultSchemaStrategy = require('../lib/schema/default-schema-strategy');
 const CollectionPerTableStrategy = require('../lib/schema/collection-per-table-strategy');
 
@@ -52,7 +52,8 @@ describe('Inventory Strategy Comparison', function() {
   
   describe('DefaultSchemaStrategy approach', function() {
     it('also stores inventory as single JSON in meta table', function(done) {
-      const adapter = new NodeSqliteAdapter({debug: false});
+    const testDbPath = path.join(__dirname, 'test-databases', 'inventory-strategy-comparison.db');
+      const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
       const storage = new SqliteStorage({
         adapter: adapter,
         schemaStrategy: new DefaultSchemaStrategy({debug: false}),
@@ -92,7 +93,7 @@ describe('Inventory Strategy Comparison', function() {
   
   describe('CollectionPerTableStrategy approach', function() {
     it('stores inventory as individual rows in sharedb_inventory table', function(done) {
-      const adapter = new NodeSqliteAdapter({debug: false});
+      const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
       const storage = new SqliteStorage({
         adapter: adapter,
         schemaStrategy: new CollectionPerTableStrategy({

@@ -2,7 +2,7 @@ const expect = require('chai').expect;
 const path = require('path');
 const fs = require('fs');
 const SqliteStorage = require('../lib/sqlite-storage');
-const NodeSqliteAdapter = require('../lib/adapters/node-sqlite-adapter');
+const BetterSqliteAdapter = require('../lib/adapters/better-sqlite-adapter');
 const CollectionPerTableStrategy = require('../lib/schema/collection-per-table-strategy');
 
 describe('Debug Inventory', function() {
@@ -21,7 +21,7 @@ describe('Debug Inventory', function() {
       fs.mkdirSync(testDbDir, { recursive: true });
     }
     
-    const adapter = new NodeSqliteAdapter({debug: false});
+    const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
     const schemaStrategy = new CollectionPerTableStrategy({
       collectionConfig: {
         'term': {

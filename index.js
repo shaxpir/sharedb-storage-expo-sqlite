@@ -1,10 +1,15 @@
-var ExpoSqliteStorage = require('./lib/expo-sqlite-storage');
-module.exports = ExpoSqliteStorage;
+// Main export is now SqliteStorage (the generic storage class)
+var SqliteStorage = require('./lib/sqlite-storage');
+module.exports = SqliteStorage;
 
-ExpoSqliteStorage.ExpoSqliteStorage = ExpoSqliteStorage;
-ExpoSqliteStorage.StandardSQLiteConnectionPool = require('./lib/connection-pool/sqlite-connection-pool');
-ExpoSqliteStorage.ExpoSqliteAdapter = require('./lib/adapters/expo-sqlite-adapter');
-ExpoSqliteStorage.NodeSqliteAdapter = require('./lib/adapters/node-sqlite-adapter');
-ExpoSqliteStorage.DefaultSchemaStrategy = require('./lib/schema/default-schema-strategy');
-ExpoSqliteStorage.CollectionPerTableStrategy = require('./lib/schema/collection-per-table-strategy');
-ExpoSqliteStorage.SqliteStorage = require('./lib/sqlite-storage');
+// Attach all exports to SqliteStorage
+SqliteStorage.SqliteStorage = SqliteStorage;
+
+// Adapters
+SqliteStorage.ExpoSqliteAdapter = require('./lib/adapters/expo-sqlite-adapter');
+SqliteStorage.BetterSqliteAdapter = require('./lib/adapters/better-sqlite-adapter');
+
+// Schema Strategies
+SqliteStorage.DefaultSchemaStrategy = require('./lib/schema/default-schema-strategy');
+SqliteStorage.CollectionPerTableStrategy = require('./lib/schema/collection-per-table-strategy');
+

@@ -2,7 +2,7 @@ const expect = require('chai').expect;
 const path = require('path');
 const fs = require('fs');
 const SqliteStorage = require('../lib/sqlite-storage');
-const NodeSqliteAdapter = require('../lib/adapters/node-sqlite-adapter');
+const BetterSqliteAdapter = require('../lib/adapters/better-sqlite-adapter');
 const DefaultSchemaStrategy = require('../lib/schema/default-schema-strategy');
 const CollectionPerTableStrategy = require('../lib/schema/collection-per-table-strategy');
 
@@ -25,7 +25,7 @@ describe('Version Management', function() {
         fs.unlinkSync(testDbPath);
       }
       
-      const adapter = new NodeSqliteAdapter({debug: false});
+      const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
       const schemaStrategy = new CollectionPerTableStrategy({
         collectionConfig: {
           'posts': { indexes: [], encryptedFields: [] }
@@ -226,7 +226,7 @@ describe('Version Management', function() {
         fs.unlinkSync(testDbPath);
       }
       
-      const adapter = new NodeSqliteAdapter({debug: false});
+      const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
       const schemaStrategy = new DefaultSchemaStrategy({debug: false});
 
       storage = new SqliteStorage({

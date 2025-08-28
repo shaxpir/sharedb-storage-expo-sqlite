@@ -78,66 +78,46 @@ declare namespace ShareDBSQLiteStorage {
   // ===============================
 
   interface SqliteAdapter {
-    readonly isReady: boolean;
-
-    openDatabase(callback: Callback): void;
-    closeDatabase(callback: Callback): void;
-    run(sql: string, params: SqlParameters, callback: Callback): void;
-    get(sql: string, params: SqlParameters, callback: Callback<any>): void;
-    all(sql: string, params: SqlParameters, callback: Callback<any[]>): void;
-    getType(): string;
-  }
-
-  interface BaseSqliteAdapter extends SqliteAdapter {}
-
-  // Expo SQLite database interface (from expo-sqlite)
-  interface ExpoSQLiteDatabase {
-    runAsync(sql: string, params?: SqlParameters): Promise<{ lastInsertRowId: number; changes: number }>;
+    connect(): Promise<void>;
+    disconnect(): Promise<void>;
+    runAsync(sql: string, params?: SqlParameters): Promise<{ lastID?: number; changes?: number }>;
     getFirstAsync(sql: string, params?: SqlParameters): Promise<any>;
     getAllAsync(sql: string, params?: SqlParameters): Promise<any[]>;
-    withTransactionAsync<T>(task: () => Promise<T>): Promise<T>;
-    closeAsync(): Promise<void>;
+    transaction<T>(operations: () => Promise<T>): Promise<T>;
   }
 
-  // Node SQLite database interface (better-sqlite3 or sqlite3)
-  interface NodeSQLiteDatabase {
-    prepare?(statement: string): any;
-    exec?(sql: string): void;
-    close?(): void;
-    [key: string]: any; // For compatibility with different SQLite libraries
-  }
 
-  interface BaseSqliteAdapterStatic {
-    new (options?: Record<string, any>): BaseSqliteAdapter;
-  }
-
-  interface ExpoSqliteAdapterOptions {
-    database: ExpoSQLiteDatabase;
-    debug?: boolean;
-  }
+  // ===============================
+  // Adapter Implementations
+  // ===============================
 
   interface ExpoSqliteAdapter extends SqliteAdapter {
-    readonly database: ExpoSQLiteDatabase;
+    readonly dirPath: string;
+    readonly fileName: string;
+    readonly debug: boolean;
   }
 
   interface ExpoSqliteAdapterStatic {
-    new (options: ExpoSqliteAdapterOptions): ExpoSqliteAdapter;
-  }
-
-  interface NodeSqliteAdapterOptions {
-    debug?: boolean;
-  }
-
-  interface NodeSqliteAdapter extends SqliteAdapter {
-    readonly db: NodeSQLiteDatabase;
+    new (fileName: string, dirPath: string, debug?: boolean): ExpoSqliteAdapter;
     
-    // Override openDatabase to match NodeSqliteAdapter's actual implementation
-    openDatabase(dbFileName: string, options?: any, dbFileDir?: string, callback?: (err: any) => void): void;
+    // Convenient static factory method
+    createWithDocumentDirectory(fileName: string, debug?: boolean): ExpoSqliteAdapter;
+    checkDatabaseExists(fileName: string, dirPath?: string): Promise<boolean>;
+    copyDatabase(fromPath: string, fileName: string, dirPath?: string): Promise<void>;
   }
 
-  interface NodeSqliteAdapterStatic {
-    new (options?: NodeSqliteAdapterOptions): NodeSqliteAdapter;
+  interface BetterSqliteAdapter extends SqliteAdapter {
+    readonly dbPath: string;
+    readonly options: any;
+    readonly debug: boolean;
   }
+
+  interface BetterSqliteAdapterStatic {
+    new (dbPath: string, options?: any): BetterSqliteAdapter;
+  }
+
+
+
 
   // ===============================
   // Schema Strategies
@@ -172,11 +152,6 @@ declare namespace ShareDBSQLiteStorage {
     deleteAllTables(db: DatabaseConnection, callback: Callback): void;
   }
 
-  interface BaseSchemaStrategy extends SchemaStrategy {}
-
-  interface BaseSchemaStrategyStatic {
-    new (options?: SchemaStrategyOptions): BaseSchemaStrategy;
-  }
 
   interface DefaultSchemaStrategyOptions extends SchemaStrategyOptions {}
 
@@ -201,48 +176,22 @@ declare namespace ShareDBSQLiteStorage {
     new (options: CollectionPerTableStrategyOptions): CollectionPerTableStrategy;
   }
 
-  // ===============================
-  // Connection Pooling
-  // ===============================
-
-  interface ConnectionPoolOptions {
-    createConnection: () => Promise<DatabaseConnection> | DatabaseConnection;
-    minConnections?: number;
-    maxConnections?: number;
-    acquireTimeoutMillis?: number;
-    idleTimeoutMillis?: number;
-    debug?: boolean;
-  }
-
-  interface ConnectionPool {
-    acquire(): Promise<DatabaseConnection>;
-    release(connection: DatabaseConnection): Promise<void>;
-    drain(): Promise<void>;
-    clear(): Promise<void>;
-    size: number;
-    available: number;
-    borrowed: number;
-    pending: number;
-    spareResourceCapacity: number;
-  }
-
-  interface ConnectionPoolStatic {
-    new (options: ConnectionPoolOptions): ConnectionPool;
-  }
 }
 
 // ===============================
-// Named Exports
+// Main Export & Named Exports
 // ===============================
 
-export const SqliteStorage: ShareDBSQLiteStorage.SqliteStorageStatic;
-export const BaseSqliteAdapter: ShareDBSQLiteStorage.BaseSqliteAdapterStatic;
-export const ExpoSqliteAdapter: ShareDBSQLiteStorage.ExpoSqliteAdapterStatic;
-export const NodeSqliteAdapter: ShareDBSQLiteStorage.NodeSqliteAdapterStatic;
-export const BaseSchemaStrategy: ShareDBSQLiteStorage.BaseSchemaStrategyStatic;
-export const DefaultSchemaStrategy: ShareDBSQLiteStorage.DefaultSchemaStrategyStatic;
-export const CollectionPerTableStrategy: ShareDBSQLiteStorage.CollectionPerTableStrategyStatic;
-export const StandardSQLiteConnectionPool: ShareDBSQLiteStorage.ConnectionPoolStatic;
+// Default export is SqliteStorage with attached properties
+export default SqliteStorage;
+declare const SqliteStorage: ShareDBSQLiteStorage.SqliteStorageStatic & {
+  SqliteStorage: ShareDBSQLiteStorage.SqliteStorageStatic;
+  ExpoSqliteAdapter: ShareDBSQLiteStorage.ExpoSqliteAdapterStatic;
+  BetterSqliteAdapter: ShareDBSQLiteStorage.BetterSqliteAdapterStatic;
+  DefaultSchemaStrategy: ShareDBSQLiteStorage.DefaultSchemaStrategyStatic;
+  CollectionPerTableStrategy: ShareDBSQLiteStorage.CollectionPerTableStrategyStatic;
+};
+
 
 // Direct type exports for better ergonomics
 export type ShareDBStorage = ShareDBSQLiteStorage.Storage;
@@ -251,7 +200,6 @@ export type StorageRecords = ShareDBSQLiteStorage.StorageRecords;
 export type SqliteAdapter = ShareDBSQLiteStorage.SqliteAdapter;
 export type SqliteSchemaStrategy = ShareDBSQLiteStorage.SchemaStrategy;
 export type CollectionConfig = ShareDBSQLiteStorage.CollectionConfig;
-export type SqliteConnectionPool = ShareDBSQLiteStorage.ConnectionPool;
 export type StorageCallback<T = void> = ShareDBSQLiteStorage.Callback<T>;
 
 // Legacy namespace for backwards compatibility
@@ -262,6 +210,5 @@ export namespace Types {
   export type SqliteAdapter = ShareDBSQLiteStorage.SqliteAdapter;
   export type SchemaStrategy = ShareDBSQLiteStorage.SchemaStrategy;
   export type CollectionConfig = ShareDBSQLiteStorage.CollectionConfig;
-  export type ConnectionPool = ShareDBSQLiteStorage.ConnectionPool;
   export type Callback<T = void> = ShareDBSQLiteStorage.Callback<T>;
 }

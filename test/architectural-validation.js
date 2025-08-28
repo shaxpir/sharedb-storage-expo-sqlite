@@ -2,7 +2,7 @@ const expect = require('chai').expect;
 const SqliteStorage = require('../lib/sqlite-storage');
 const DefaultSchemaStrategy = require('../lib/schema/default-schema-strategy');
 const CollectionPerTableStrategy = require('../lib/schema/collection-per-table-strategy');
-const NodeSqliteAdapter = require('../lib/adapters/node-sqlite-adapter');
+const BetterSqliteAdapter = require('../lib/adapters/better-sqlite-adapter');
 
 describe('Architectural Validation - SQLite Storage', function() {
 
@@ -11,7 +11,7 @@ describe('Architectural Validation - SQLite Storage', function() {
     let adapter;
 
     beforeEach(function() {
-      adapter = new NodeSqliteAdapter({ debug: false });
+      adapter = new BetterSqliteAdapter(':memory:', { debug: false });
       storage = new SqliteStorage({
         adapter: adapter,
         dbFileName: ':memory:',
@@ -85,7 +85,7 @@ describe('Architectural Validation - SQLite Storage', function() {
     let adapter;
 
     beforeEach(function(done) {
-      adapter = new NodeSqliteAdapter({ debug: false });
+      adapter = new BetterSqliteAdapter(':memory:', { debug: false });
       storage = new SqliteStorage({
         adapter: adapter,
         dbFileName: ':memory:',
@@ -100,6 +100,7 @@ describe('Architectural Validation - SQLite Storage', function() {
     });
 
     it('should use error-first callback convention consistently', function(done) {
+    const testDbPath = path.join(__dirname, 'test-databases', 'architectural-validation.db');
       const testRecord = {
         id: 'callback-test-1',
         payload: { title: 'Callback Test', data: { test: true } }
@@ -160,7 +161,7 @@ describe('Architectural Validation - SQLite Storage', function() {
     let adapter;
 
     beforeEach(function(done) {
-      adapter = new NodeSqliteAdapter({ debug: false });
+      adapter = new BetterSqliteAdapter(':memory:', { debug: false });
       storage = new SqliteStorage({
         adapter: adapter,
         dbFileName: ':memory:',
@@ -283,7 +284,7 @@ describe('Architectural Validation - SQLite Storage', function() {
         testProperty: 'context-test-value'
       });
       
-      const adapter = new NodeSqliteAdapter({ debug: false });
+      const adapter = new BetterSqliteAdapter(':memory:', { debug: false });
       const storage = new SqliteStorage({
         adapter: adapter,
         schemaStrategy: strategy,
@@ -322,7 +323,7 @@ describe('Architectural Validation - SQLite Storage', function() {
     });
 
     it('should handle promise chains in db wrapper correctly', function(done) {
-      const adapter = new NodeSqliteAdapter({ debug: false });
+      const adapter = new BetterSqliteAdapter(':memory:', { debug: false });
       const storage = new SqliteStorage({
         adapter: adapter,
         dbFileName: ':memory:',
@@ -409,7 +410,7 @@ describe('Architectural Validation - SQLite Storage', function() {
 
   describe('Schema Strategy Namespace Collision Prevention', function() {
     it('should prevent user collections from colliding with system tables', function(done) {
-      const adapter = new NodeSqliteAdapter({ debug: false });
+      const adapter = new BetterSqliteAdapter(':memory:', { debug: false });
       const strategy = new CollectionPerTableStrategy({
         collectionConfig: {
           'meta': { indexes: [], encryptedFields: [] },
@@ -482,7 +483,7 @@ describe('Architectural Validation - SQLite Storage', function() {
     let adapter;
 
     beforeEach(function(done) {
-      adapter = new NodeSqliteAdapter({ debug: false });
+      adapter = new BetterSqliteAdapter(':memory:', { debug: false });
       storage = new SqliteStorage({
         adapter: adapter,
         dbFileName: ':memory:',

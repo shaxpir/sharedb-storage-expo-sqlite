@@ -2,7 +2,7 @@ const expect = require('chai').expect;
 const path = require('path');
 const fs = require('fs');
 const SqliteStorage = require('../lib/sqlite-storage');
-const NodeSqliteAdapter = require('../lib/adapters/node-sqlite-adapter');
+const BetterSqliteAdapter = require('../lib/adapters/better-sqlite-adapter');
 const CollectionPerTableStrategy = require('../lib/schema/collection-per-table-strategy');
 
 describe('Simple Write Test', function() {
@@ -18,7 +18,7 @@ describe('Simple Write Test', function() {
       fs.unlinkSync(testDbPath);
     }
     
-    const adapter = new NodeSqliteAdapter({debug: true}); // Enable debug
+    const adapter = new BetterSqliteAdapter(testDbPath, {debug: true}); // Enable debug
     const schemaStrategy = new CollectionPerTableStrategy({
       collectionConfig: {
         'term': {

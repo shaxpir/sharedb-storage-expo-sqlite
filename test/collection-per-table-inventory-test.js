@@ -2,7 +2,7 @@ const expect = require('chai').expect;
 const path = require('path');
 const fs = require('fs');
 const SqliteStorage = require('../lib/sqlite-storage');
-const NodeSqliteAdapter = require('../lib/adapters/node-sqlite-adapter');
+const BetterSqliteAdapter = require('../lib/adapters/better-sqlite-adapter');
 const CollectionPerTableStrategy = require('../lib/schema/collection-per-table-strategy');
 
 describe('CollectionPerTableStrategy Inventory Management', function() {
@@ -32,7 +32,7 @@ describe('CollectionPerTableStrategy Inventory Management', function() {
   });
 
   it('should properly maintain inventory when writing documents', function(done) {
-    const adapter = new NodeSqliteAdapter({debug: false});
+    const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
     const schemaStrategy = new CollectionPerTableStrategy({
       collectionConfig: {
         'term': {
@@ -113,7 +113,7 @@ describe('CollectionPerTableStrategy Inventory Management', function() {
   });
 
   it('should find documents using inventory when collection is not specified', function(done) {
-    const adapter = new NodeSqliteAdapter({debug: false});
+    const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
     const schemaStrategy = new CollectionPerTableStrategy({
       collectionConfig: {
         'term': {
@@ -163,7 +163,7 @@ describe('CollectionPerTableStrategy Inventory Management', function() {
   });
 
   it('should return null for non-existent documents', function(done) {
-    const adapter = new NodeSqliteAdapter({debug: false});
+    const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
     const schemaStrategy = new CollectionPerTableStrategy({
       collectionConfig: {
         'term': {
@@ -195,7 +195,7 @@ describe('CollectionPerTableStrategy Inventory Management', function() {
   });
 
   it('should handle documents with null collections gracefully', function(done) {
-    const adapter = new NodeSqliteAdapter({debug: false});
+    const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
     const schemaStrategy = new CollectionPerTableStrategy({
       collectionConfig: {
         'term': {
@@ -237,7 +237,7 @@ describe('CollectionPerTableStrategy Inventory Management', function() {
   });
 
   it('should update inventory when documents are updated', function(done) {
-    const adapter = new NodeSqliteAdapter({debug: false});
+    const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
     const schemaStrategy = new CollectionPerTableStrategy({
       collectionConfig: {
         'term': {
@@ -293,7 +293,7 @@ describe('CollectionPerTableStrategy Inventory Management', function() {
   });
 
   it('should handle bulk reads with inventory lookups', function(done) {
-    const adapter = new NodeSqliteAdapter({debug: false});
+    const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
     const schemaStrategy = new CollectionPerTableStrategy({
       collectionConfig: {
         'term': {
@@ -367,7 +367,7 @@ describe('CollectionPerTableStrategy Inventory Management', function() {
   });
 
   it('should properly clean up inventory when documents are deleted', function(done) {
-    const adapter = new NodeSqliteAdapter({debug: false});
+    const adapter = new BetterSqliteAdapter(testDbPath, {debug: false});
     const schemaStrategy = new CollectionPerTableStrategy({
       collectionConfig: {
         'term': {
