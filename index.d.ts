@@ -159,6 +159,54 @@ declare namespace ShareDBSQLiteStorage {
     new (options: CollectionPerTableStrategyOptions): CollectionPerTableStrategy;
   }
 
+  // ===============================
+  // Attachment Support
+  // ===============================
+
+  interface DatabaseAttachment {
+    path?: string;
+    fileName?: string;
+    dirPath?: string;
+    alias: string;
+    strategy?: SchemaStrategy;
+  }
+
+  interface AttachedSqliteAdapter extends SqliteAdapter {
+    readonly attachments: DatabaseAttachment[];
+    readonly attached: boolean;
+    attachSingleDatabase(attachment: DatabaseAttachment): Promise<void>;
+    preInitializeDatabase(attachment: DatabaseAttachment): Promise<void>;
+  }
+
+  interface AttachmentConfig {
+    fileName: string;
+    dirPath: string;
+    alias: string;
+    strategy?: SchemaStrategy;
+  }
+
+  interface AttachedExpoSqliteAdapterOptions {
+    attachments: AttachmentConfig[];
+  }
+
+  interface AttachedExpoSqliteAdapter extends AttachedSqliteAdapter {
+    readonly database: any;
+  }
+
+  interface AttachedExpoSqliteAdapterStatic {
+    new (mainDbFileName: string, mainDbDirPath: string, options?: AttachedExpoSqliteAdapterOptions, readonly?: boolean): AttachedExpoSqliteAdapter;
+  }
+
+  interface AttachedCollectionPerTableStrategy extends CollectionPerTableStrategy {
+    attachmentAlias: string | null;
+    preInitializeDatabase(db: any, strategy: AttachedCollectionPerTableStrategy, callback?: Callback): Promise<void>;
+  }
+
+  interface AttachedCollectionPerTableStrategyStatic {
+    new (attachmentAlias?: string): AttachedCollectionPerTableStrategy;
+    preInitializeDatabase(db: any, strategy: AttachedCollectionPerTableStrategy, callback?: Callback): Promise<void>;
+  }
+
 }
 
 // ===============================
@@ -170,6 +218,8 @@ export default SqliteStorage;
 declare const SqliteStorage: ShareDBSQLiteStorage.SqliteStorageStatic & {
   SqliteStorage: ShareDBSQLiteStorage.SqliteStorageStatic;
   ExpoSqliteAdapter: ShareDBSQLiteStorage.ExpoSqliteAdapterStatic;
+  AttachedExpoSqliteAdapter: ShareDBSQLiteStorage.AttachedExpoSqliteAdapterStatic;
+  AttachedCollectionPerTableStrategy: ShareDBSQLiteStorage.AttachedCollectionPerTableStrategyStatic;
   BetterSqliteAdapter: ShareDBSQLiteStorage.BetterSqliteAdapterStatic;
   DefaultSchemaStrategy: ShareDBSQLiteStorage.DefaultSchemaStrategyStatic;
   CollectionPerTableStrategy: ShareDBSQLiteStorage.CollectionPerTableStrategyStatic;
@@ -188,22 +238,9 @@ export type SqliteAdapter = ShareDBSQLiteStorage.SqliteAdapter;
 export type SqliteSchemaStrategy = ShareDBSQLiteStorage.SchemaStrategy;
 export type CollectionConfig = ShareDBSQLiteStorage.CollectionConfig;
 
-// ===============================
-// Legacy Exports (DEPRECATED - use direct imports)
-// ===============================
-export namespace Types {
-  /** @deprecated Import DurableStorage directly */
-  export type Storage = DurableStorage;
-  /** @deprecated Import DurableStorageRecord directly */
-  export type StorageRecord = DurableStorageRecord;
-  /** @deprecated Import DurableStorageRecords directly */
-  export type StorageRecords = DurableStorageRecords;
-  /** @deprecated Import SqliteAdapter directly */
-  export type SqliteAdapter = ShareDBSQLiteStorage.SqliteAdapter;
-  /** @deprecated Import SqliteSchemaStrategy directly */
-  export type SchemaStrategy = SqliteSchemaStrategy;
-  /** @deprecated Import CollectionConfig directly */
-  export type CollectionConfig = ShareDBSQLiteStorage.CollectionConfig;
-  /** @deprecated Import DurableStorageCallback directly */
-  export type Callback<T = any> = DurableStorageCallback<T>;
-}
+// Attachment support exports
+export type AttachedSqliteAdapter = ShareDBSQLiteStorage.AttachedSqliteAdapter;
+export type AttachedExpoSqliteAdapter = ShareDBSQLiteStorage.AttachedExpoSqliteAdapter;
+export type AttachedCollectionPerTableStrategy = ShareDBSQLiteStorage.AttachedCollectionPerTableStrategy;
+export type DatabaseAttachment = ShareDBSQLiteStorage.DatabaseAttachment;
+export type AttachmentConfig = ShareDBSQLiteStorage.AttachmentConfig;
