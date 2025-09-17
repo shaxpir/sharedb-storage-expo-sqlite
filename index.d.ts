@@ -213,18 +213,17 @@ declare namespace ShareDBSQLiteStorage {
 // Main Export & Named Exports
 // ===============================
 
-// Default export is SqliteStorage with attached properties
-export default SqliteStorage;
-declare const SqliteStorage: ShareDBSQLiteStorage.SqliteStorageStatic & {
-  SqliteStorage: ShareDBSQLiteStorage.SqliteStorageStatic;
-  ExpoSqliteAdapter: ShareDBSQLiteStorage.ExpoSqliteAdapterStatic;
-  AttachedExpoSqliteAdapter: ShareDBSQLiteStorage.AttachedExpoSqliteAdapterStatic;
-  AttachedCollectionPerTableStrategy: ShareDBSQLiteStorage.AttachedCollectionPerTableStrategyStatic;
-  BetterSqliteAdapter: ShareDBSQLiteStorage.BetterSqliteAdapterStatic;
-  DefaultSchemaStrategy: ShareDBSQLiteStorage.DefaultSchemaStrategyStatic;
-  CollectionPerTableStrategy: ShareDBSQLiteStorage.CollectionPerTableStrategyStatic;
-};
+// Named exports (matching index.js)
+export const SqliteStorage: ShareDBSQLiteStorage.SqliteStorageStatic;
+export const ExpoSqliteAdapter: ShareDBSQLiteStorage.ExpoSqliteAdapterStatic;
+export const AttachedExpoSqliteAdapter: ShareDBSQLiteStorage.AttachedExpoSqliteAdapterStatic;
+export const DefaultSchemaStrategy: ShareDBSQLiteStorage.DefaultSchemaStrategyStatic;
+export const CollectionPerTableStrategy: ShareDBSQLiteStorage.CollectionPerTableStrategyStatic;
+export const AttachedCollectionPerTableStrategy: ShareDBSQLiteStorage.AttachedCollectionPerTableStrategyStatic;
 
+// Default export
+declare const _default: ShareDBSQLiteStorage.SqliteStorageStatic;
+export default _default;
 
 // ===============================
 // Main Interface Exports - Clean Names
@@ -238,9 +237,9 @@ export type SqliteAdapter = ShareDBSQLiteStorage.SqliteAdapter;
 export type SqliteSchemaStrategy = ShareDBSQLiteStorage.SchemaStrategy;
 export type CollectionConfig = ShareDBSQLiteStorage.CollectionConfig;
 
-// Attachment support exports
+// Attachment support exports - export both as types
 export type AttachedSqliteAdapter = ShareDBSQLiteStorage.AttachedSqliteAdapter;
-export type AttachedExpoSqliteAdapter = ShareDBSQLiteStorage.AttachedExpoSqliteAdapter;
-export type AttachedCollectionPerTableStrategy = ShareDBSQLiteStorage.AttachedCollectionPerTableStrategy;
+export type AttachedExpoSqliteAdapterType = ShareDBSQLiteStorage.AttachedExpoSqliteAdapter;
+export type AttachedCollectionPerTableStrategyType = ShareDBSQLiteStorage.AttachedCollectionPerTableStrategy;
 export type DatabaseAttachment = ShareDBSQLiteStorage.DatabaseAttachment;
 export type AttachmentConfig = ShareDBSQLiteStorage.AttachmentConfig;
