@@ -1,6 +1,6 @@
 {
   "name": "@shaxpir/sharedb-storage-expo-sqlite",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "description": "Expo SQLite storage adapter for ShareDB with dual-database and connection pooling support",
   "main": "index.js",
   "types": "index.d.ts",
