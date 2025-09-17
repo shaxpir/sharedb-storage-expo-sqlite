@@ -191,20 +191,25 @@ declare namespace ShareDBSQLiteStorage {
 
   interface AttachedExpoSqliteAdapter extends AttachedSqliteAdapter {
     readonly database: any;
+    schemaStrategy?: SchemaStrategy;
   }
 
   interface AttachedExpoSqliteAdapterStatic {
     new (mainDbFileName: string, mainDbDirPath: string, options?: AttachedExpoSqliteAdapterOptions, readonly?: boolean): AttachedExpoSqliteAdapter;
   }
 
+  interface AttachedCollectionPerTableStrategyOptions extends CollectionPerTableStrategyOptions {
+    attachmentAlias?: string;
+    createAdapterForPath?: (dbPath: string) => SqliteAdapter;
+  }
+
   interface AttachedCollectionPerTableStrategy extends CollectionPerTableStrategy {
     attachmentAlias: string | null;
-    preInitializeDatabase(db: any, strategy: AttachedCollectionPerTableStrategy, callback?: Callback): Promise<void>;
+    preInitializeDatabase(dbPath: string, createAdapter: (dbPath: string) => SqliteAdapter): Promise<void>;
   }
 
   interface AttachedCollectionPerTableStrategyStatic {
-    new (attachmentAlias?: string): AttachedCollectionPerTableStrategy;
-    preInitializeDatabase(db: any, strategy: AttachedCollectionPerTableStrategy, callback?: Callback): Promise<void>;
+    new (options?: AttachedCollectionPerTableStrategyOptions): AttachedCollectionPerTableStrategy;
   }
 
 }
@@ -241,5 +246,6 @@ export type CollectionConfig = ShareDBSQLiteStorage.CollectionConfig;
 export type AttachedSqliteAdapter = ShareDBSQLiteStorage.AttachedSqliteAdapter;
 export type AttachedExpoSqliteAdapterType = ShareDBSQLiteStorage.AttachedExpoSqliteAdapter;
 export type AttachedCollectionPerTableStrategyType = ShareDBSQLiteStorage.AttachedCollectionPerTableStrategy;
+export type AttachedCollectionPerTableStrategyOptions = ShareDBSQLiteStorage.AttachedCollectionPerTableStrategyOptions;
 export type DatabaseAttachment = ShareDBSQLiteStorage.DatabaseAttachment;
 export type AttachmentConfig = ShareDBSQLiteStorage.AttachmentConfig;
