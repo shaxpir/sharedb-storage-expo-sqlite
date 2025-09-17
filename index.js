@@ -1,13 +1,18 @@
+// Re-export SqliteStorage and schema strategies from upstream package
+var upstream = require('@shaxpir/sharedb-storage-sqlite');
+var SqliteStorage = upstream.SqliteStorage;
+
 // Main export is SqliteStorage (the generic storage class)
-var SqliteStorage = require('./lib/sqlite-storage');
 module.exports = SqliteStorage;
 
 // Attach all exports to SqliteStorage
 SqliteStorage.SqliteStorage = SqliteStorage;
 
-// React Native adapter - no conditional loading needed since this is React Native only
+// Expo-specific adapters
 SqliteStorage.ExpoSqliteAdapter = require('./lib/adapters/expo-sqlite-adapter');
+SqliteStorage.AttachedExpoSqliteAdapter = require('./lib/adapters/attached-expo-sqlite-adapter');
 
-// Schema Strategies
-SqliteStorage.DefaultSchemaStrategy = require('./lib/schema/default-schema-strategy');
-SqliteStorage.CollectionPerTableStrategy = require('./lib/schema/collection-per-table-strategy');
+// Schema Strategies from upstream
+SqliteStorage.DefaultSchemaStrategy = upstream.DefaultSchemaStrategy;
+SqliteStorage.CollectionPerTableStrategy = upstream.CollectionPerTableStrategy;
+SqliteStorage.AttachedCollectionPerTableStrategy = upstream.AttachedCollectionPerTableStrategy;
