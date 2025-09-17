@@ -35,6 +35,7 @@
     "expo-sqlite": ">=14.0.0"
   },
   "dependencies": {
+    "@shaxpir/sharedb-storage-sqlite": "^1.2.3",
     "generic-pool": "^3.9.0"
   },
   "devDependencies": {
