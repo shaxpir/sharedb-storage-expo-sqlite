@@ -5,12 +5,25 @@
 /// <reference types="node" />
 
 import { EventEmitter } from 'events';
-import { 
-  DurableStorage, 
-  DurableStorageRecord, 
-  DurableStorageRecords, 
-  DurableStorageCallback 
+import {
+  DurableStorage,
+  DurableStorageRecord,
+  DurableStorageRecords,
+  DurableStorageCallback
 } from '@shaxpir/sharedb';
+
+// Re-export types from the base library
+import {
+  SqliteAdapter as BaseSqliteAdapter,
+  SchemaStrategy,
+  SchemaStrategyOptions,
+  AttachedCollectionPerTableStrategyOptions as BaseAttachedCollectionPerTableStrategyOptions,
+  CollectionConfig,
+  DatabaseAttachment,
+  ProjectionColumnMapping,
+  ProjectionIndexConfig,
+  ArrayProjectionConfig
+} from '@shaxpir/sharedb-storage-sqlite';
 
 declare namespace ShareDBSQLiteStorage {
   // ===============================
@@ -198,18 +211,13 @@ declare namespace ShareDBSQLiteStorage {
     new (mainDbFileName: string, mainDbDirPath: string, options?: AttachedExpoSqliteAdapterOptions, readonly?: boolean): AttachedExpoSqliteAdapter;
   }
 
-  interface AttachedCollectionPerTableStrategyOptions extends CollectionPerTableStrategyOptions {
-    attachmentAlias?: string;
-    createAdapterForPath?: (dbPath: string) => SqliteAdapter;
-  }
-
   interface AttachedCollectionPerTableStrategy extends CollectionPerTableStrategy {
-    attachmentAlias: string | null;
+    readonly attachmentAlias: string | null;
     preInitializeDatabase(dbPath: string, createAdapter: (dbPath: string) => SqliteAdapter): Promise<void>;
   }
 
   interface AttachedCollectionPerTableStrategyStatic {
-    new (options?: AttachedCollectionPerTableStrategyOptions): AttachedCollectionPerTableStrategy;
+    new (options?: BaseAttachedCollectionPerTableStrategyOptions): AttachedCollectionPerTableStrategy;
   }
 
 }
@@ -246,6 +254,6 @@ export type CollectionConfig = ShareDBSQLiteStorage.CollectionConfig;
 export type AttachedSqliteAdapter = ShareDBSQLiteStorage.AttachedSqliteAdapter;
 export type AttachedExpoSqliteAdapterType = ShareDBSQLiteStorage.AttachedExpoSqliteAdapter;
 export type AttachedCollectionPerTableStrategyType = ShareDBSQLiteStorage.AttachedCollectionPerTableStrategy;
-export type AttachedCollectionPerTableStrategyOptions = ShareDBSQLiteStorage.AttachedCollectionPerTableStrategyOptions;
+export type AttachedCollectionPerTableStrategyOptions = BaseAttachedCollectionPerTableStrategyOptions;
 export type DatabaseAttachment = ShareDBSQLiteStorage.DatabaseAttachment;
 export type AttachmentConfig = ShareDBSQLiteStorage.AttachmentConfig;
