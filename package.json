@@ -35,7 +35,7 @@
     "expo-sqlite": ">=14.0.0"
   },
   "dependencies": {
-    "@shaxpir/sharedb-storage-sqlite": "^1.4.11",
+    "@shaxpir/sharedb-storage-sqlite": "^2.0.0",
     "generic-pool": "^3.9.0"
   },
   "devDependencies": {
@@ -49,12 +49,10 @@
   },
   "files": [
     "lib/",
-    "test/",
     "docs/",
     "index.js",
     "index.d.ts",
-    "README.md",
-    "PROJECT_PLAN.md"
+    "README.md"
   ],
   "scripts": {
     "test": "echo 'Tests run in Node.js package only'",
